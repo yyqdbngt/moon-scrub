@@ -19,6 +19,12 @@
 
 ## 使用
 
+MoonCakes `0.1.0` 已发布并通过独立消费项目验证：
+
+```sh
+moon add yyqdbngt/moon_scrub@0.1.0
+```
+
 ```moonbit nocheck
 ///|
 fn main {
@@ -57,4 +63,5 @@ CI 在 wasm、wasm-gc、js、native 四后端执行格式检查、静态检查�
 不计入统计。Apache-2.0。
 
 完整边界见 [安全模型](docs/security-model.md)，非正式申报参考稿见
-[proposal.md](docs/proposal.md)。
+[proposal.md](docs/proposal.md)，发布证据见
+[release-verification.md](docs/release-verification.md)。

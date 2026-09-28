@@ -4,6 +4,9 @@ Offline sensitive-data detection and redaction for MoonBit applications.
 Findings contain category, confidence, and UTF-16 offsets, but never retain the
 matched value.
 
+Version `0.1.0` is published on MoonCakes. Install it with
+`moon add yyqdbngt/moon_scrub@0.1.0`.
+
 ## Public API
 
 - `scan(text, policy~) -> Array[Finding]`
