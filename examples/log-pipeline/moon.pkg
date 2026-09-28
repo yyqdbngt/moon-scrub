@@ -1,0 +1,5 @@
+import {
+  "yyqdbngt/moon_scrub" @scrub,
+}
+
+pkgtype(kind: "executable")
