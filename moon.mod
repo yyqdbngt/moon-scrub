@@ -1,0 +1,13 @@
+name = "yyqdbngt/moon_scrub"
+
+version = "0.1.0"
+
+readme = "README.mbt.md"
+
+repository = "https://github.com/yyqdbngt/moon-scrub"
+
+license = "Apache-2.0"
+
+keywords = [ "security", "redaction", "secrets", "pii", "logs" ]
+
+description = "Offline sensitive-data detection and redaction for MoonBit applications."
