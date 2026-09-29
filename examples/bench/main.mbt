@@ -76,6 +76,30 @@ fn time_pass_micros(corpus : Array[String]) -> Double {
 }
 
 ///|
+/// Build a deterministic JSON document with planted findings: several
+/// hundred string leaves, a third of them carrying an email or credential.
+fn make_json_document(records : Int) -> String {
+  let buf = StringBuilder()
+  buf.write_string("{\"records\":[")
+  for i = 0; i < records; i = i + 1 {
+    if i > 0 {
+      buf.write_char(Int::unsafe_to_char(44))
+    }
+    let (word, _) = make_word(77L + i.to_int64(), 8)
+    let note = if i % 3 == 0 {
+      "mail " + word + "@example.com"
+    } else if i % 3 == 1 {
+      "password=" + word + "value"
+    } else {
+      "ordinary note " + word
+    }
+    buf.write_string("{\"id\":" + i.to_string() + ",\"note\":\"" + note + "\"}")
+  }
+  buf.write_string("]}")
+  buf.to_string()
+}
+
+///|
 fn main {
   let lines = 20000
   let (corpus, bytes) = make_corpus(lines)
@@ -106,6 +130,30 @@ fn main {
     println("throughput-mbps=n/a (clock unavailable)")
   }
   println("findings-per-pass=" + (total_findings / iterations).to_string())
+  // JSON throughput: parse-and-redact one document per iteration.
+  let json_doc = make_json_document(2000)
+  let json_start = @mbench.monotonic_clock_start()
+  let mut json_changed = 0
+  for _ in 0..<10 {
+    let doc = @scrub.redact_json(json_doc)
+    if doc.parsed {
+      json_changed += doc.changed_fields
+    } else {
+      abort("benchmark document failed to parse")
+    }
+  }
+  let json_micros = @mbench.monotonic_clock_end(json_start)
+  println("json-bytes=" + (json_doc.length() * 10).to_string())
+  println("json-micros=" + json_micros.to_string())
+  if json_micros > 0.0 {
+    let json_seconds = json_micros / 1000000.0
+    let mbps = json_doc.length().to_double() *
+      10.0 /
+      (1024.0 * 1024.0) /
+      json_seconds
+    println("json-throughput-mbps=" + mbps.to_string())
+  }
+  println("json-changed-per-pass=" + (json_changed / 10).to_string())
   // Linearity gate: an 8x input must not cost more than 8x the time (with a
   // generous constant). Quadratic rescanning, the classic streaming-scanner
   // regression, fails this immediately. Clock-less targets skip the check.
