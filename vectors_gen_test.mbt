@@ -690,3 +690,41 @@ test "vector: ipv6-double-compression-rejected" {
   )
   assert_eq(findings.length(), 0)
 }
+
+///|
+test "vector: phone-e164-cn" {
+  let input = "call +8613800138000 now"
+  let findings = @moon_scrub.scan_with_config(input, {
+    ..@moon_scrub.ScanConfig::standard(),
+    detect_phone: true,
+  })
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "PHONE")
+  assert_eq(findings[0].start, 5)
+  assert_eq(findings[0].end, 19)
+  assert_eq(findings[0].confidence, @moon_scrub.Medium)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "+8613800138000",
+  )
+}
+
+///|
+test "vector: phone-e164-short-rejected" {
+  let input = "ref +1234567 nope"
+  let findings = @moon_scrub.scan_with_config(input, {
+    ..@moon_scrub.ScanConfig::standard(),
+    detect_phone: true,
+  })
+  assert_eq(findings.length(), 0)
+}
+
+///|
+test "vector: phone-off-by-default" {
+  let input = "call +8613800138000 now"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 0)
+}

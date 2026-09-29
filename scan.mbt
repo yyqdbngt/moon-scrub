@@ -819,6 +819,36 @@ fn scan_ipv6(text : String, out : Array[Finding]) -> Unit {
 }
 
 ///|
+/// E.164 phone numbers: a plus sign followed by eight to fifteen digits with
+/// a non-zero country code. Opt-in because bare international numbers are
+/// frequently order ids or reference codes; grouped formats like
+/// `+86 138 0013 8000` are not matched.
+fn scan_phones(text : String, out : Array[Finding]) -> Unit {
+  let mut i = 0
+  while i < text.length() {
+    if text[i].to_int() == 43 &&
+      i + 1 < text.length() &&
+      text[i + 1].to_int() >= 49 &&
+      text[i + 1].to_int() <= 57 {
+      let start = i
+      let mut end = i + 1
+      while end < text.length() && is_ascii_digit(text[end].to_int()) {
+        end += 1
+      }
+      let digits = end - start - 1
+      if digits >= 8 && digits <= 15 {
+        push_finding(out, Phone, start, end, Medium)
+        i = end
+      } else {
+        i += 1
+      }
+    } else {
+      i += 1
+    }
+  }
+}
+
+///|
 fn run_detectors(
   text : String,
   config : ScanConfig,
@@ -850,6 +880,9 @@ fn run_detectors(
   }
   if config.detect_ipv6 {
     scan_ipv6(text, out)
+  }
+  if config.detect_phone {
+    scan_phones(text, out)
   }
   // Resident IDs outrank payment cards: an eighteen-digit checksummed
   // identity number is stronger evidence than a Luhn pass, and Mastercard

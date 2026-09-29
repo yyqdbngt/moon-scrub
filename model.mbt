@@ -16,6 +16,7 @@ pub(all) enum SensitiveKind {
   MacAddress
   Uuid
   Ipv6
+  Phone
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -38,6 +39,7 @@ pub fn SensitiveKind::to_string(self : SensitiveKind) -> String {
     UrlCredential => "URL_CREDENTIAL"
     CustomSecret => "CUSTOM_SECRET"
     ResidentId => "RESIDENT_ID"
+    Phone => "PHONE"
     Ipv6 => "IPV6"
     Uuid => "UUID"
     MacAddress => "MAC_ADDRESS"
@@ -142,6 +144,7 @@ pub(all) struct BatchSummary {
   mut mac_addresses : Int
   mut uuids : Int
   mut ipv6s : Int
+  mut phones : Int
 } derive(Eq, @debug.Debug)
 
 ///|

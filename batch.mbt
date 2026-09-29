@@ -18,6 +18,7 @@ fn empty_summary(lines : Int) -> BatchSummary {
     mac_addresses: 0,
     uuids: 0,
     ipv6s: 0,
+    phones: 0,
   }
 }
 
@@ -51,6 +52,7 @@ pub fn redact_batch(
         UrlCredential => summary.url_credentials += 1
         CustomSecret => summary.custom_secrets += 1
         ResidentId => summary.resident_ids += 1
+        Phone => summary.phones += 1
         Ipv6 => summary.ipv6s += 1
         Uuid => summary.uuids += 1
         MacAddress => summary.mac_addresses += 1

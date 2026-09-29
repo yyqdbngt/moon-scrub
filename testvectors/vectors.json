@@ -486,6 +486,30 @@
       "mode": "config",
       "input": "no 1::2::3",
       "expect": []
+    },
+    {
+      "name": "phone-e164-cn",
+      "mode": "phone",
+      "input": "call +8613800138000 now",
+      "expect": [
+        {
+          "kind": "PHONE",
+          "literal": "+8613800138000",
+          "confidence": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "name": "phone-e164-short-rejected",
+      "mode": "phone",
+      "input": "ref +1234567 nope",
+      "expect": []
+    },
+    {
+      "name": "phone-off-by-default",
+      "mode": "config",
+      "input": "call +8613800138000 now",
+      "expect": []
     }
   ]
 }
