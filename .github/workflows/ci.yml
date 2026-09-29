@@ -36,3 +36,5 @@ jobs:
       - run: moon test --target ${{ matrix.target }} --deny-warn
       - run: moon run examples/log-pipeline --target ${{ matrix.target }}
       - run: moon run examples/bench --target ${{ matrix.target }}
+      - run: moon run examples/json-pipeline --target ${{ matrix.target }}
+      - run: moon run examples/stream-pipeline --target ${{ matrix.target }}
