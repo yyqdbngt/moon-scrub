@@ -1,0 +1,251 @@
+{
+  "format": 1,
+  "generator": "scripts/gen_vectors.py",
+  "notes": "Cross-language detection vectors. Every sample is synthetic; no real credential appears here. Ports of moon-scrub to other languages should read this file and assert the same kind/start/end/confidence tuples. Offsets are UTF-16 code units, half-open [start, end). mode 'secrets' maps to secrets-only scanning (emails, IPv4 and cards disabled); 'standard' enables all families.",
+  "vectors": [
+    {
+      "name": "github-classic-pat",
+      "mode": "secrets",
+      "input": "token=ghp_1234567890abcdefghij",
+      "expect": [
+        { "kind": "ACCESS_TOKEN", "literal": "ghp_1234567890abcdefghij", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "github-fine-grained-pat",
+      "mode": "secrets",
+      "input": "deploy github_pat_19gjdks8Dhdf7sKJ9mnbVfx4",
+      "expect": [
+        { "kind": "ACCESS_TOKEN", "literal": "github_pat_19gjdks8Dhdf7sKJ9mnbVfx4", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "github-app-token",
+      "mode": "secrets",
+      "input": "auth ghs_abcdefghijklmnopqrstuvwxyz12",
+      "expect": [
+        { "kind": "ACCESS_TOKEN", "literal": "ghs_abcdefghijklmnopqrstuvwxyz12", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "gitlab-pat",
+      "mode": "secrets",
+      "input": "ci glpat-abcdefghijklmnopqrst",
+      "expect": [
+        { "kind": "ACCESS_TOKEN", "literal": "glpat-abcdefghijklmnopqrst", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "slack-bot-token",
+      "mode": "secrets",
+      "input": "slack=xoxb-123456789012-123456789012-abcdefghij",
+      "expect": [
+        { "kind": "ACCESS_TOKEN", "literal": "xoxb-123456789012-123456789012-abcdefghij", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "aws-access-key",
+      "mode": "secrets",
+      "input": "key AKIAIOSFODNN7EXAMPLE end",
+      "expect": [
+        { "kind": "ACCESS_TOKEN", "literal": "AKIAIOSFODNN7EXAMPLE", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "google-api-key",
+      "mode": "secrets",
+      "input": "google AIzaSyA1234567890abcdefghij maps",
+      "expect": [
+        { "kind": "ACCESS_TOKEN", "literal": "AIzaSyA1234567890abcdefghij", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "stripe-live-secret",
+      "mode": "secrets",
+      "input": "stripe sk_live_abcdefghijklmnopqrst charge",
+      "expect": [
+        { "kind": "ACCESS_TOKEN", "literal": "sk_live_abcdefghijklmnopqrst", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "anthropic-key",
+      "mode": "secrets",
+      "input": "llm sk-ant-api03-abcdefghijklmnop call",
+      "expect": [
+        { "kind": "ACCESS_TOKEN", "literal": "sk-ant-api03-abcdefghijklmnop", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "openai-style-key",
+      "mode": "secrets",
+      "input": "gpt sk-proj-abcdefghijklmnopqrst",
+      "expect": [
+        { "kind": "ACCESS_TOKEN", "literal": "sk-proj-abcdefghijklmnopqrst", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "sendgrid-key",
+      "mode": "secrets",
+      "input": "mail SG.abcdefghijklmnop.qrstuvwxyz123456",
+      "expect": [
+        { "kind": "ACCESS_TOKEN", "literal": "SG.abcdefghijklmnop.qrstuvwxyz123456", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "npm-token",
+      "mode": "secrets",
+      "input": "publish npm_abcdefghijklmnopqrstuvwxyz1234",
+      "expect": [
+        { "kind": "ACCESS_TOKEN", "literal": "npm_abcdefghijklmnopqrstuvwxyz1234", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "doppler-token",
+      "mode": "secrets",
+      "input": "doppler dop_v1_abcdef1234567890abcdef12",
+      "expect": [
+        { "kind": "ACCESS_TOKEN", "literal": "dop_v1_abcdef1234567890abcdef12", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "bearer-header-value",
+      "mode": "secrets",
+      "input": "authorization: Bearer abcdefghijklmnop",
+      "expect": [
+        { "kind": "BEARER_TOKEN", "literal": "abcdefghijklmnop", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "jwt-three-segments",
+      "mode": "secrets",
+      "input": "jwt=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.signature",
+      "expect": [
+        { "kind": "JWT", "literal": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.signature", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "private-key-block",
+      "mode": "secrets",
+      "input": "-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAAS\\n-----END PRIVATE KEY-----",
+      "expect": [
+        { "kind": "PRIVATE_KEY", "literal": "-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAAS\\n-----END PRIVATE KEY-----", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "url-embedded-password",
+      "mode": "secrets",
+      "input": "postgres://alice:s3cret@db.example/app",
+      "expect": [
+        { "kind": "URL_CREDENTIAL", "literal": "alice:s3cret", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "assignment-plain",
+      "mode": "secrets",
+      "input": "password=hunter2 ok",
+      "expect": [
+        { "kind": "CREDENTIAL", "literal": "hunter2", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "assignment-quoted",
+      "mode": "secrets",
+      "input": "secret: \"world value\" done",
+      "expect": [
+        { "kind": "CREDENTIAL", "literal": "world value", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "email-basic",
+      "mode": "standard",
+      "input": "mail demo@example.com stop",
+      "expect": [
+        { "kind": "EMAIL", "literal": "demo@example.com", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "ipv4-plain",
+      "mode": "standard",
+      "input": "connect 192.168.1.20 now",
+      "expect": [
+        { "kind": "IPV4", "literal": "192.168.1.20", "confidence": "MEDIUM" }
+      ]
+    },
+    {
+      "name": "ipv4-trailing-period",
+      "mode": "standard",
+      "input": "peer 10.0.0.8. down",
+      "expect": [
+        { "kind": "IPV4", "literal": "10.0.0.8", "confidence": "MEDIUM" }
+      ]
+    },
+    {
+      "name": "ipv4-version-suppressed",
+      "mode": "standard",
+      "input": "upgraded to v1.2.3.4 and 2.0.0.1rc1",
+      "expect": []
+    },
+    {
+      "name": "ipv4-invalid-octet",
+      "mode": "standard",
+      "input": "bad 999.1.1.1 address",
+      "expect": []
+    },
+    {
+      "name": "card-spaced-groups",
+      "mode": "standard",
+      "input": "card 4111 1111 1111 1111 end",
+      "expect": [
+        { "kind": "PAYMENT_CARD", "literal": "4111 1111 1111 1111", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "card-amex-fifteen",
+      "mode": "standard",
+      "input": "amex 378282246310005 end",
+      "expect": [
+        { "kind": "PAYMENT_CARD", "literal": "378282246310005", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "card-luhn-invalid",
+      "mode": "standard",
+      "input": "declined 4111-1111-1111-1112",
+      "expect": []
+    },
+    {
+      "name": "card-nonbin-suppressed",
+      "mode": "standard",
+      "input": "order 1234567890123452 done",
+      "expect": []
+    },
+    {
+      "name": "secrets-only-skips-pii",
+      "mode": "secrets",
+      "input": "demo@example.com 10.0.0.1 4111111111111111",
+      "expect": []
+    },
+    {
+      "name": "standard-detects-pii",
+      "mode": "standard",
+      "input": "demo@example.com 10.0.0.1 4111111111111111",
+      "expect": [
+        { "kind": "EMAIL", "literal": "demo@example.com", "confidence": "HIGH" },
+        { "kind": "IPV4", "literal": "10.0.0.1", "confidence": "MEDIUM" },
+        { "kind": "PAYMENT_CARD", "literal": "4111111111111111", "confidence": "HIGH" }
+      ]
+    },
+    {
+      "name": "already-redacted-stays-clean",
+      "mode": "secrets",
+      "input": "password=[REDACTED:CREDENTIAL] ok",
+      "expect": []
+    },
+    {
+      "name": "short-prefixed-runs-ignored",
+      "mode": "secrets",
+      "input": "key=AIza123 and sk-abc",
+      "expect": []
+    }
+  ]
+}

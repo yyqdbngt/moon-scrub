@@ -48,11 +48,18 @@ fn is_email_local(c : Int) -> Bool {
 }
 
 ///|
+/// Character-wise prefix test with no intermediate allocation; this sits on
+/// the hottest scanning path.
 fn starts_at(text : String, at : Int, prefix : String) -> Bool {
   if at < 0 || at + prefix.length() > text.length() {
     return false
   }
-  text[at:at + prefix.length()].to_owned() == prefix
+  for k = 0; k < prefix.length(); k = k + 1 {
+    if text[at + k] != prefix[k] {
+      return false
+    }
+  }
+  true
 }
 
 ///|

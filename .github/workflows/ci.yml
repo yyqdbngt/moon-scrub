@@ -6,6 +6,14 @@ on:
 permissions:
   contents: read
 jobs:
+  vectors:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 scripts/gen_vectors.py --check
   verify:
     runs-on: ubuntu-latest
     strategy:
@@ -19,9 +27,10 @@ jobs:
           node-version: '24'
       - uses: hustcer/setup-moonbit@87e2bdf5cf20d3b6f5c5f266a8a513f503bb5b76
         with:
-          version: '0.10.12+1634b282e'
+          version: '0.10.14+7d59c7ec9'
       - run: moon fmt --check
       - run: moon check --target ${{ matrix.target }} --deny-warn
       - run: moon build --target ${{ matrix.target }} --deny-warn
       - run: moon test --target ${{ matrix.target }} --deny-warn
       - run: moon run examples/log-pipeline --target ${{ matrix.target }}
+      - run: moon run examples/bench --target ${{ matrix.target }}

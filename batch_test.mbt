@@ -1,6 +1,6 @@
 ///|
 test "batch redaction keeps line count and safe category totals" {
-  let result = redact_batch([
+  let result = @moon_scrub.redact_batch([
     "login demo@example.com from 10.0.0.1", "password=not-for-logs", "request complete",
     "card 4111 1111 1111 1111",
   ])
@@ -13,7 +13,7 @@ test "batch redaction keeps line count and safe category totals" {
   assert_eq(result.summary.credentials, 1)
   assert_eq(result.summary.payment_cards, 1)
   for line in result.lines {
-    assert_true(verify_clean(line))
+    assert_true(@moon_scrub.verify_clean(line))
   }
 }
 
@@ -33,7 +33,7 @@ test "ten thousand log lines preserve count and deterministic totals" {
       },
     )
   }
-  let result = redact_batch(lines)
+  let result = @moon_scrub.redact_batch(lines)
   assert_eq(result.lines.length(), 10000)
   assert_eq(result.summary.changed_lines, 7500)
   assert_eq(result.summary.findings, 7500)

@@ -32,19 +32,40 @@ pub fn redact(
   style? : RedactionStyle = Typed,
   policy? : ScanPolicy = ScanPolicy::standard(),
 ) -> RedactionResult {
-  let findings = scan(text, policy~)
-  if findings.length() == 0 {
-    return { text, findings, changed: false, }
+  redact_with_config(text, policy.to_config(), style~)
+}
+
+///|
+/// Redact with full detector configuration, suppressor toggles and extra
+/// prefixed-token rules.
+pub fn redact_with_config(
+  text : String,
+  config : ScanConfig,
+  style? : RedactionStyle = Typed,
+) -> RedactionResult {
+  let findings = scan_with_config(text, config)
+  {
+    text: redact_with_findings(text, findings, style),
+    findings,
+    changed: findings.length() > 0,
   }
-  let mut out = ""
-  let mut cursor = 0
-  for finding in findings {
-    out += text[cursor:finding.start].to_owned()
-    out += replacement(text, finding, style)
-    cursor = finding.end
+}
+
+///|
+/// Redact with both built-in detectors under full configuration and
+/// caller-supplied exact-value rules.
+pub fn redact_full(
+  text : String,
+  rules : Array[CustomRule],
+  config : ScanConfig,
+  style? : RedactionStyle = Typed,
+) -> RedactionResult {
+  let findings = scan_full(text, rules, config)
+  {
+    text: redact_with_findings(text, findings, style),
+    findings,
+    changed: findings.length() > 0,
   }
-  out += text[cursor:].to_owned()
-  { text: out, findings, changed: true, }
 }
 
 ///|
@@ -54,4 +75,10 @@ pub fn verify_clean(
   policy? : ScanPolicy = ScanPolicy::standard(),
 ) -> Bool {
   scan(text, policy~).length() == 0
+}
+
+///|
+/// Return true only when a fresh configured scan finds nothing.
+pub fn verify_clean_with_config(text : String, config : ScanConfig) -> Bool {
+  scan_with_config(text, config).length() == 0
 }

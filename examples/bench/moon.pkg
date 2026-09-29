@@ -1,0 +1,6 @@
+import {
+  "yyqdbngt/moon_scrub" @scrub,
+  "moonbitlang/core/bench" @mbench,
+}
+
+pkgtype(kind: "executable")
