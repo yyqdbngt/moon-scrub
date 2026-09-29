@@ -8,6 +8,15 @@ repository = "https://github.com/yyqdbngt/moon-scrub"
 
 license = "Apache-2.0"
 
-keywords = [ "security", "redaction", "secrets", "pii", "logs" ]
+keywords = [
+  "security",
+  "redaction",
+  "secrets",
+  "pii",
+  "logs",
+  "streaming",
+  "json",
+  "detection",
+]
 
-description = "Offline sensitive-data detection and redaction for MoonBit applications."
+description = "Offline sensitive-data detection, redaction, JSON and streaming pipelines for MoonBit applications."
