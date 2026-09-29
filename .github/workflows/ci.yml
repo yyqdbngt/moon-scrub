@@ -14,6 +14,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: python3 scripts/gen_vectors.py --check
+      - run: python3 scripts/reference_scan.py
   verify:
     runs-on: ubuntu-latest
     strategy:
