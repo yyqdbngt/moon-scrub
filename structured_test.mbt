@@ -75,3 +75,20 @@ test "redact_fields_with_config enables new families per field" {
   assert_eq(result.fields[0].value, "[REDACTED:MAC_ADDRESS]")
   assert_eq(result.fields[1].value, "Ada")
 }
+
+///|
+test "extended key names fail closed on structured paths too" {
+  let result = @moon_scrub.redact_fields_with_config(
+    [
+      @moon_scrub.StructuredField::{
+        path: "azure.shared_access_key",
+        value: "opaque-base64-ish-blob",
+      },
+      @moon_scrub.StructuredField::{ path: "meta.kind", value: "deployment", },
+    ],
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(result.changed_fields, 1)
+  assert_eq(result.fields[0].value, "[REDACTED:CREDENTIAL]")
+  assert_eq(result.fields[1].value, "deployment")
+}
