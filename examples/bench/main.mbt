@@ -100,6 +100,148 @@ fn make_json_document(records : Int) -> String {
 }
 
 ///|
+/// One pass per detector family over a mixed sample, reporting the
+/// relative cost of each family in isolation.
+fn family_breakdown() -> Unit {
+  let sample = make_corpus(4000)
+  let corpus = sample.0
+  let families : Array[(String, @scrub.ScanConfig)] = []
+  families.push(
+    (
+      "access-token",
+      {
+        ..@scrub.ScanConfig::standard(),
+        detect_bearer: false,
+        detect_jwt: false,
+        detect_private_key: false,
+        detect_url_credential: false,
+        detect_assignment: false,
+        detect_email: false,
+        detect_ipv4: false,
+        detect_ipv6: false,
+        detect_resident_id: false,
+        detect_mac: false,
+        detect_uuid: false,
+        detect_public_key: false,
+        detect_wallet: false,
+        detect_webhook: false,
+        detect_payment_card: false,
+      },
+    ),
+  )
+  families.push(
+    (
+      "assignment",
+      {
+        ..@scrub.ScanConfig::standard(),
+        detect_access_token: false,
+        detect_bearer: false,
+        detect_jwt: false,
+        detect_private_key: false,
+        detect_url_credential: false,
+        detect_email: false,
+        detect_ipv4: false,
+        detect_ipv6: false,
+        detect_resident_id: false,
+        detect_mac: false,
+        detect_uuid: false,
+        detect_public_key: false,
+        detect_wallet: false,
+        detect_webhook: false,
+        detect_payment_card: false,
+      },
+    ),
+  )
+  families.push(
+    (
+      "email",
+      {
+        ..@scrub.ScanConfig::standard(),
+        detect_access_token: false,
+        detect_bearer: false,
+        detect_jwt: false,
+        detect_private_key: false,
+        detect_url_credential: false,
+        detect_assignment: false,
+        detect_ipv4: false,
+        detect_ipv6: false,
+        detect_resident_id: false,
+        detect_mac: false,
+        detect_uuid: false,
+        detect_public_key: false,
+        detect_wallet: false,
+        detect_webhook: false,
+        detect_payment_card: false,
+      },
+    ),
+  )
+  families.push(
+    (
+      "ipv4",
+      {
+        ..@scrub.ScanConfig::standard(),
+        detect_access_token: false,
+        detect_bearer: false,
+        detect_jwt: false,
+        detect_private_key: false,
+        detect_url_credential: false,
+        detect_assignment: false,
+        detect_email: false,
+        detect_ipv6: false,
+        detect_resident_id: false,
+        detect_mac: false,
+        detect_uuid: false,
+        detect_public_key: false,
+        detect_wallet: false,
+        detect_webhook: false,
+        detect_payment_card: false,
+      },
+    ),
+  )
+  families.push(
+    (
+      "cards",
+      {
+        ..@scrub.ScanConfig::standard(),
+        detect_access_token: false,
+        detect_bearer: false,
+        detect_jwt: false,
+        detect_private_key: false,
+        detect_url_credential: false,
+        detect_assignment: false,
+        detect_email: false,
+        detect_ipv4: false,
+        detect_ipv6: false,
+        detect_resident_id: false,
+        detect_mac: false,
+        detect_uuid: false,
+        detect_public_key: false,
+        detect_wallet: false,
+        detect_webhook: false,
+      },
+    ),
+  )
+  families.push(("everything", @scrub.ScanConfig::standard()))
+  for pair in families {
+    let start = @mbench.monotonic_clock_start()
+    let mut total = 0
+    for _ in 0..<3 {
+      let result = @scrub.redact_batch_with_config(corpus, pair.1)
+      total += result.summary.findings
+    }
+    let micros = @mbench.monotonic_clock_end(start)
+    println(
+      "family-" +
+      pair.0 +
+      "-micros=" +
+      micros.to_string() +
+      " findings=" +
+      (total / 3).to_string(),
+    )
+  }
+}
+
+///|
 fn main {
   let lines = 20000
   let (corpus, bytes) = make_corpus(lines)
@@ -154,6 +296,7 @@ fn main {
     println("json-throughput-mbps=" + mbps.to_string())
   }
   println("json-changed-per-pass=" + (json_changed / 10).to_string())
+  family_breakdown()
   // Linearity gate: an 8x input must not cost more than 8x the time (with a
   // generous constant). Quadratic rescanning, the classic streaming-scanner
   // regression, fails this immediately. Clock-less targets skip the check.
