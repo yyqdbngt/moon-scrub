@@ -420,6 +420,11 @@ fn ipv4_octet(text : String, start : Int, end : Int) -> Bool {
   if end <= start || end - start > 3 {
     return false
   }
+  // Leading zeros are ambiguous dotted-decimal (octal in some parsers) and
+  // appear far more often in version strings than in addresses.
+  if end - start > 1 && text[start].to_int() == 48 {
+    return false
+  }
   let mut value = 0
   for i = start; i < end; i = i + 1 {
     if !is_ascii_digit(text[i].to_int()) {

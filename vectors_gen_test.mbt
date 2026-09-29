@@ -881,3 +881,10 @@ test "vector: card-amex-spaced" {
     "3782 822463 10005",
   )
 }
+
+///|
+test "vector: ipv4-leading-zero-rejected" {
+  let input = "no 010.1.1.1 and 192.168.001.7"
+  let findings = @moon_scrub.scan(input)
+  assert_eq(findings.length(), 0)
+}

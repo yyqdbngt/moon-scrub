@@ -207,7 +207,9 @@ def scan_emails(text, out):
 
 
 def ipv4_octet(part):
-    return part.isdigit() and len(part) <= 3 and int(part) <= 255
+    if part.isdigit() and len(part) <= 3 and int(part) <= 255:
+        return len(part) == 1 or not part.startswith("0")
+    return False
 
 
 def ipv4_run_end(run):
