@@ -185,6 +185,7 @@ pub(all) struct ScanConfig {
   detect_mac : Bool
   suppress_version_ipv4 : Bool
   require_known_card_prefix : Bool
+  suppress_example_domains : Bool
   extra_prefixes : Array[TokenPrefixRule]
 } derive(Eq, @debug.Debug)
 pub fn ScanConfig::equal(Self, Self) -> Bool
