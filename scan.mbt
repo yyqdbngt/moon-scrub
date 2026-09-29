@@ -184,7 +184,7 @@ fn pem_footer_end(text : String, from : Int) -> Int {
 fn scan_private_keys(text : String, out : Array[Finding]) -> Unit {
   let begins = [
     "-----BEGIN PRIVATE KEY-----", "-----BEGIN RSA PRIVATE KEY-----", "-----BEGIN EC PRIVATE KEY-----",
-    "-----BEGIN OPENSSH PRIVATE KEY-----",
+    "-----BEGIN OPENSSH PRIVATE KEY-----", "-----BEGIN ENCRYPTED PRIVATE KEY-----",
   ]
   for i = 0; i < text.length(); i = i + 1 {
     for begin in begins {
