@@ -86,3 +86,34 @@ test "chunked scanning accepts custom configurations" {
   assert_eq(findings.length(), 1)
   assert_eq(findings[0].kind, @moon_scrub.AccessToken)
 }
+
+///|
+test "push_lines matches per-line pushes" {
+  let lines = [
+    "login demo@example.com", "auth: Bearer abcdefghijklmnop", "plain line",
+  ]
+  let batched = @moon_scrub.ChunkScanner::new(overlap=16)
+  let from_batch = batched.push_lines(lines)
+  let tail = batched.finish()
+  let per_line = @moon_scrub.ChunkScanner::new(overlap=16)
+  let collected : Array[@moon_scrub.Finding] = []
+  for line in lines {
+    let chunk = line + "\n"
+    for finding in per_line.push(chunk) {
+      collected.push(finding)
+    }
+  }
+  for finding in per_line.finish() {
+    collected.push(finding)
+  }
+  assert_eq(from_batch.length() + tail.length(), collected.length())
+  let mut offset = 0
+  for finding in from_batch {
+    assert_eq(finding, collected[offset])
+    offset += 1
+  }
+  for finding in tail {
+    assert_eq(finding, collected[offset])
+    offset += 1
+  }
+}

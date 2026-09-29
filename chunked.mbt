@@ -75,6 +75,21 @@ pub fn ChunkScanner::push(
 }
 
 ///|
+/// Push complete log lines with their newline included and collect settled
+/// findings. Equivalent to one push per line, but a single buffer append.
+pub fn ChunkScanner::push_lines(
+  self : ChunkScanner,
+  lines : Array[String],
+) -> Array[Finding] {
+  let batch = StringBuilder()
+  for line in lines {
+    batch.write_string(line)
+    batch.write_char(Int::unsafe_to_char(10))
+  }
+  self.push(batch.to_string())
+}
+
+///|
 /// Flush the remaining tail and close the stream. Chunks pushed afterwards
 /// are ignored.
 pub fn ChunkScanner::finish(self : ChunkScanner) -> Array[Finding] {
