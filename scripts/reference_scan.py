@@ -179,7 +179,7 @@ def scan_assignments(text, out):
                 push(out, "CREDENTIAL", start + 1, end, "HIGH")
         else:
             end = start
-            while end < len(text) and text[end] not in " \t\n\r,;\"'}]":
+            while end < len(text) and text[end] not in " \t\n\r,;\"'})]":
                 end += 1
             push(out, "CREDENTIAL", start, end, "HIGH")
 
