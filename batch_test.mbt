@@ -61,3 +61,13 @@ test "redact_batch_with_config enables new families in pipelines" {
   assert_eq(result.summary.resident_ids, 1)
   assert_eq(result.lines[0], "id [REDACTED:RESIDENT_ID]")
 }
+
+///|
+test "config batches count changed lines like policy batches" {
+  let result = @moon_scrub.redact_batch_with_config(
+    ["password=hunter2", "plain"],
+    @moon_scrub.ScanConfig::secrets_only(),
+  )
+  assert_eq(result.summary.changed_lines, 1)
+  assert_eq(result.changed_indices.length(), 1)
+}
