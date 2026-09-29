@@ -14,7 +14,15 @@ struct ChunkScanner {
   mut buffer : StringBuilder
   mut base : Int
   mut finished : Bool
+  mut emitted_until : Int
 }
+
+///|
+/// Findings can start after their trigger text: assignments need the key,
+/// bearer and basic auth need the header word, URLs need the scheme. The
+/// window must retain this much text before the first unsettled finding or
+/// re-scanning a sliding window loses the match.
+const CHUNK_CONTEXT_MARGIN : Int = 32
 
 ///|
 /// Build a chunked scanner. `overlap` is clamped to at least 64 code units.
@@ -32,6 +40,7 @@ pub fn ChunkScanner::new(
     buffer: StringBuilder(),
     base: 0,
     finished: false,
+    emitted_until: 0,
   }
 }
 
@@ -48,6 +57,10 @@ pub fn ChunkScanner::push(
   }
   self.buffer.write_string(chunk)
   let window = self.buffer.to_string()
+  // to_string hands off the backing array when it is exactly full, so the
+  // builder must be re-seeded from the materialized window in every path.
+  self.buffer = StringBuilder()
+  self.buffer.write_string(window)
   if window.length() <= self.overlap {
     return []
   }
@@ -57,19 +70,32 @@ pub fn ChunkScanner::push(
   let mut drop = limit
   for finding in findings {
     if finding.end <= limit {
-      settled.push({
-        kind: finding.kind,
-        start: self.base + finding.start,
-        end: self.base + finding.end,
-        confidence: finding.confidence,
-      })
+      let abs_start = self.base + finding.start
+      // The window can retreat behind the context margin, re-showing an
+      // already-emitted match; dedup keeps it single-reported.
+      if abs_start >= self.emitted_until {
+        settled.push({
+          kind: finding.kind,
+          start: abs_start,
+          end: self.base + finding.end,
+          confidence: finding.confidence,
+        })
+        self.emitted_until = self.base + finding.end
+      }
       drop = finding.end
     } else {
+      // Keep the finding plus its trigger context alive until it settles.
+      let keep_from = if finding.start < CHUNK_CONTEXT_MARGIN {
+        0
+      } else {
+        finding.start - CHUNK_CONTEXT_MARGIN
+      }
+      if keep_from < drop {
+        drop = keep_from
+      }
       break
     }
   }
-  // `scan_with_config` returns disjoint, start-ordered findings, so dropping
-  // through the last settled end can never cut into a pending match.
   self.base += drop
   let kept = window[drop:].to_owned()
   self.buffer = StringBuilder()
@@ -100,15 +126,20 @@ pub fn ChunkScanner::finish(self : ChunkScanner) -> Array[Finding] {
     return []
   }
   self.finished = true
-  let findings = scan_with_config(self.buffer.to_string(), self.config)
+  let window = self.buffer.to_string()
+  self.buffer = StringBuilder()
+  self.buffer.write_string(window)
+  let findings = scan_with_config(window, self.config)
   let out : Array[Finding] = []
   for finding in findings {
-    out.push({
-      kind: finding.kind,
-      start: self.base + finding.start,
-      end: self.base + finding.end,
-      confidence: finding.confidence,
-    })
+    if self.base + finding.start >= self.emitted_until {
+      out.push({
+        kind: finding.kind,
+        start: self.base + finding.start,
+        end: self.base + finding.end,
+        confidence: finding.confidence,
+      })
+    }
   }
   self.buffer = StringBuilder()
   self.base = 0

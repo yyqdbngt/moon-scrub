@@ -117,3 +117,73 @@ test "push_lines matches per-line pushes" {
     offset += 1
   }
 }
+
+///|
+/// Deterministic Lehmer generator for property-style corpora.
+fn prop_lcg(state : Int64) -> Int64 {
+  state * 48271L % 2147483647L
+}
+
+///|
+/// Build a mixed corpus from a seed: alternating filler words, planted
+/// emails, credentials, tokens, cards, and version-shaped noise that must
+/// stay suppressed even under chunking.
+fn prop_corpus(seed : Int64, lines : Int) -> String {
+  let letters = "abcdefghijklmnopqrstuvwxyz"
+  let buf = StringBuilder()
+  let mut state = seed
+  for i = 0; i < lines; i = i + 1 {
+    state = prop_lcg(state)
+    let word = StringBuilder()
+    for _ in 0..<10 {
+      state = prop_lcg(state)
+      word.write_char(
+        Int::unsafe_to_char(letters[(state % 26L).to_int()].to_int()),
+      )
+    }
+    let w = word.to_string()
+    buf.write_string(
+      match i % 6 {
+        0 => "mail " + w + "@example.com\n"
+        1 => "password=" + w + "value\n"
+        2 => "token=ghp_" + w + w + "1234\n"
+        3 => "card 4111 1111 1111 1111 ver v1.2.3.4\n"
+        4 => "ip 10.0." + (i % 200).to_string() + ".7 note\n"
+        _ => "plain " + w + " request\n"
+      },
+    )
+  }
+  buf.to_string()
+}
+
+///|
+test "chunked scanning equals whole scanning on generated corpora" {
+  for seed in [7L, 99L, 12345L] {
+    let corpus = prop_corpus(seed, 60)
+    let expected = @moon_scrub.scan(corpus)
+    assert_true(expected.length() > 10)
+    for size in [1, 5, 23, 97, 512, 4096] {
+      let scanner = @moon_scrub.ChunkScanner::new(overlap=256)
+      let actual : Array[@moon_scrub.Finding] = []
+      let mut i = 0
+      while i < corpus.length() {
+        let end = if i + size < corpus.length() {
+          i + size
+        } else {
+          corpus.length()
+        }
+        for finding in scanner.push(corpus[i:end].to_owned()) {
+          actual.push(finding)
+        }
+        i = end
+      }
+      for finding in scanner.finish() {
+        actual.push(finding)
+      }
+      assert_eq(actual.length(), expected.length())
+      for k = 0; k < expected.length(); k = k + 1 {
+        assert_eq(actual[k], expected[k])
+      }
+    }
+  }
+}
