@@ -866,3 +866,18 @@ test "vector: basic-auth-header" {
     "dXNlcm5hbWU6cGFzc3dvcmQ=",
   )
 }
+
+///|
+test "vector: card-amex-spaced" {
+  let input = "amex 3782 822463 10005 end"
+  let findings = @moon_scrub.scan(input)
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "PAYMENT_CARD")
+  assert_eq(findings[0].start, 5)
+  assert_eq(findings[0].end, 22)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "3782 822463 10005",
+  )
+}

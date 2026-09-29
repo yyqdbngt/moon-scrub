@@ -600,6 +600,18 @@
           "confidence": "HIGH"
         }
       ]
+    },
+    {
+      "name": "card-amex-spaced",
+      "mode": "standard",
+      "input": "amex 3782 822463 10005 end",
+      "expect": [
+        {
+          "kind": "PAYMENT_CARD",
+          "literal": "3782 822463 10005",
+          "confidence": "HIGH"
+        }
+      ]
     }
   ]
 }

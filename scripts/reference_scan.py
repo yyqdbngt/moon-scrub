@@ -275,7 +275,7 @@ def scan_cards(text, out):
                     digits.append(int(c))
                     end += 1
                 elif end > i and text[end - 1].isdigit() and (
-                        c == "-" or (c == " " and len(digits) in (4, 8, 12))):
+                        c == "-" or (c == " " and len(digits) in (4, 8, 10, 12))):
                     end += 1
                 else:
                     break

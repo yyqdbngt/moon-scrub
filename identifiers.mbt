@@ -572,13 +572,14 @@ fn scan_cards(text : String, require_bin : Bool, out : Array[Finding]) -> Unit {
               (
                 digits.length() == 4 ||
                 digits.length() == 8 ||
+                digits.length() == 10 ||
                 digits.length() == 12
               )
             )
           ) {
           // Hyphenated groups anywhere; spaces only at the usual 4/8/12
-          // digit boundaries, so an unrelated neighbouring number is never
-          // glued onto a card candidate.
+          // Visa-style boundaries and 4/10 for Amex 4-6-5, so an unrelated
+          // neighbouring number is never glued onto a card candidate.
           end += 1
         } else {
           break
