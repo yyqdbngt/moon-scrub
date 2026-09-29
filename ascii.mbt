@@ -14,6 +14,11 @@ fn is_ascii_alnum(c : Int) -> Bool {
 }
 
 ///|
+fn is_ascii_hexdigit(c : Int) -> Bool {
+  is_ascii_digit(c) || (c >= 97 && c <= 102) || (c >= 65 && c <= 70)
+}
+
+///|
 fn is_token_char(c : Int) -> Bool {
   is_ascii_alnum(c) || c == 45 || c == 46 || c == 95
 }

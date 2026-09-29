@@ -378,6 +378,36 @@
       "mode": "config",
       "input": "id 110105200102290010 rejected",
       "expect": []
+    },
+    {
+      "name": "mac-colon",
+      "mode": "config",
+      "input": "nic 02:00:5e:10:00:03 up",
+      "expect": [
+        {
+          "kind": "MAC_ADDRESS",
+          "literal": "02:00:5e:10:00:03",
+          "confidence": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "name": "mac-hyphen",
+      "mode": "config",
+      "input": "ap dc-a6-32-0f-88-01 joined",
+      "expect": [
+        {
+          "kind": "MAC_ADDRESS",
+          "literal": "dc-a6-32-0f-88-01",
+          "confidence": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "name": "mac-mixed-separators-rejected",
+      "mode": "config",
+      "input": "bad 02:00-5e:10-00:03 nope",
+      "expect": []
     }
   ]
 }

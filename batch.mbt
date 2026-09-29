@@ -15,6 +15,7 @@ fn empty_summary(lines : Int) -> BatchSummary {
     url_credentials: 0,
     custom_secrets: 0,
     resident_ids: 0,
+    mac_addresses: 0,
   }
 }
 
@@ -48,6 +49,7 @@ pub fn redact_batch(
         UrlCredential => summary.url_credentials += 1
         CustomSecret => summary.custom_secrets += 1
         ResidentId => summary.resident_ids += 1
+        MacAddress => summary.mac_addresses += 1
       }
     }
   }

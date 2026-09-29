@@ -527,3 +527,49 @@ test "vector: resident-id-impossible-date" {
   )
   assert_eq(findings.length(), 0)
 }
+
+///|
+test "vector: mac-colon" {
+  let input = "nic 02:00:5e:10:00:03 up"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "MAC_ADDRESS")
+  assert_eq(findings[0].start, 4)
+  assert_eq(findings[0].end, 21)
+  assert_eq(findings[0].confidence, @moon_scrub.Medium)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "02:00:5e:10:00:03",
+  )
+}
+
+///|
+test "vector: mac-hyphen" {
+  let input = "ap dc-a6-32-0f-88-01 joined"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "MAC_ADDRESS")
+  assert_eq(findings[0].start, 3)
+  assert_eq(findings[0].end, 20)
+  assert_eq(findings[0].confidence, @moon_scrub.Medium)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "dc-a6-32-0f-88-01",
+  )
+}
+
+///|
+test "vector: mac-mixed-separators-rejected" {
+  let input = "bad 02:00-5e:10-00:03 nope"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 0)
+}

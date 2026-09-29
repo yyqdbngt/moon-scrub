@@ -581,9 +581,7 @@ fn resident_id_birth_ok(text : String, start : Int) -> Bool {
 /// GB 11643-1999 check digit: weighted sum of the first 17 digits under
 /// weights 7 9 10 5 8 4 2 1 6 3 7 9 10 5 8 4 2, mapped through `10X98765432`.
 fn resident_id_checksum_ok(text : String, start : Int) -> Bool {
-  let weights = [
-    7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2,
-  ]
+  let weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2]
   let order = "10X98765432"
   let mut sum = 0
   for k = 0; k < 17; k = k + 1 {
@@ -604,7 +602,7 @@ fn scan_resident_ids(text : String, out : Array[Finding]) -> Unit {
       (i == 0 || !is_ascii_alnum(text[i - 1].to_int())) {
       let end = i + 18
       let last = text[end - 1].to_int()
-      let shaped = (if is_ascii_digit(last) || last == 88 || last == 120 {
+      let shaped = if is_ascii_digit(last) || last == 88 || last == 120 {
         let mut k = i
         while k < end - 1 && is_ascii_digit(text[k].to_int()) {
           k += 1
@@ -612,7 +610,7 @@ fn scan_resident_ids(text : String, out : Array[Finding]) -> Unit {
         k == end - 1
       } else {
         false
-      })
+      }
       let tail_free = end >= text.length() ||
         (
           !is_ascii_alnum(text[end].to_int()) &&
@@ -625,6 +623,48 @@ fn scan_resident_ids(text : String, out : Array[Finding]) -> Unit {
         resident_id_birth_ok(text, i) {
         push_finding(out, ResidentId, i, end, High)
         i = end
+      } else {
+        i += 1
+      }
+    } else {
+      i += 1
+    }
+  }
+}
+
+///|
+/// EUI-48 hardware addresses: six hyphen-or-colon separated hex pairs with a
+/// consistent separator. Reported at medium confidence because most log
+/// occurrences are ordinary device identifiers rather than personal data.
+fn scan_mac_addresses(text : String, out : Array[Finding]) -> Unit {
+  let mut i = 0
+  while i + 17 <= text.length() {
+    if is_ascii_hexdigit(text[i].to_int()) &&
+      (i == 0 || !is_ascii_hexdigit(text[i - 1].to_int())) {
+      let sep = text[i + 2].to_int()
+      if sep == 58 || sep == 45 {
+        let mut k = i + 2
+        let mut groups = 1
+        while groups < 6 {
+          if text[k].to_int() != sep {
+            break
+          }
+          if !(is_ascii_hexdigit(text[k + 1].to_int()) &&
+            is_ascii_hexdigit(text[k + 2].to_int())) {
+            break
+          }
+          k += 3
+          groups += 1
+        }
+        let end = i + 17
+        let tail = if end < text.length() { text[end].to_int() } else { -1 }
+        if groups == 6 &&
+          (tail == -1 || (!is_ascii_hexdigit(tail) && tail != 58 && tail != 45)) {
+          push_finding(out, MacAddress, i, end, Medium)
+          i = end
+        } else {
+          i += 1
+        }
       } else {
         i += 1
       }
@@ -669,6 +709,9 @@ fn run_detectors(
   // BINs (51-55) overlap common area codes.
   if config.detect_resident_id {
     scan_resident_ids(text, out)
+  }
+  if config.detect_mac {
+    scan_mac_addresses(text, out)
   }
   if config.detect_payment_card {
     scan_cards(text, config.require_known_card_prefix, out)

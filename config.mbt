@@ -30,6 +30,7 @@ pub(all) struct ScanConfig {
   detect_ipv4 : Bool
   detect_payment_card : Bool
   detect_resident_id : Bool
+  detect_mac : Bool
   suppress_version_ipv4 : Bool
   require_known_card_prefix : Bool
   extra_prefixes : Array[TokenPrefixRule]
@@ -55,6 +56,7 @@ pub fn ScanConfig::standard() -> ScanConfig {
     detect_ipv4: true,
     detect_payment_card: true,
     detect_resident_id: true,
+    detect_mac: true,
     suppress_version_ipv4: true,
     require_known_card_prefix: true,
     extra_prefixes: [],
@@ -71,6 +73,7 @@ pub fn ScanConfig::secrets_only() -> ScanConfig {
     detect_ipv4: false,
     detect_payment_card: false,
     detect_resident_id: false,
+    detect_mac: false,
   }
 }
 
