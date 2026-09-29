@@ -246,7 +246,18 @@ fn sensitive_key(key : String) -> Bool {
   k == "apikey" ||
   k == "private_key" ||
   k == "authorization" ||
-  k == "client_secret"
+  k == "client_secret" ||
+  k == "account_key" ||
+  k == "shared_access_key" ||
+  k == "sharedaccesskey" ||
+  k == "secret_key" ||
+  k == "private_token" ||
+  k == "passphrase" ||
+  k == "credential" ||
+  k == "auth_token" ||
+  k == "refresh_token" ||
+  k == "session_key" ||
+  k == "aws_secret_access_key"
 }
 
 ///|
