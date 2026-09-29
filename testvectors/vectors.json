@@ -660,6 +660,18 @@
           "confidence": "MEDIUM"
         }
       ]
+    },
+    {
+      "name": "assignment-value-in-call-args",
+      "mode": "secrets",
+      "input": "auth(login(password=hunter2)) failed",
+      "expect": [
+        {
+          "kind": "CREDENTIAL",
+          "literal": "hunter2",
+          "confidence": "HIGH"
+        }
+      ]
     }
   ]
 }

@@ -92,6 +92,7 @@ fn trim_value_end(text : String, start : Int) -> Int {
       c == 59 ||
       c == 34 ||
       c == 39 ||
+      c == 41 ||
       c == 125 ||
       c == 93 {
       break

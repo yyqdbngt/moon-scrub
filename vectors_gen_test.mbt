@@ -937,3 +937,18 @@ test "vector: ipv4-cidr-suffix" {
   assert_eq(findings[0].confidence, @moon_scrub.Medium)
   assert_eq(input[findings[0].start:findings[0].end].to_owned(), "10.0.0.0")
 }
+
+///|
+test "vector: assignment-value-in-call-args" {
+  let input = "auth(login(password=hunter2)) failed"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "CREDENTIAL")
+  assert_eq(findings[0].start, 20)
+  assert_eq(findings[0].end, 27)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(input[findings[0].start:findings[0].end].to_owned(), "hunter2")
+}

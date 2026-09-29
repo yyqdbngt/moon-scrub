@@ -72,7 +72,7 @@ def scan_bearer(text, out):
     for m in re.finditer(r"[Bb]earer ", text):
         start = m.end()
         end = start
-        while end < len(text) and text[end] not in " \t\n\r,;\"'}]":
+        while end < len(text) and text[end] not in " \t\n\r,;\"'})]":
             end += 1
         if end - start >= 8 and not text.startswith("[REDACTED", start):
             push(out, "BEARER_TOKEN", start, end, "HIGH")
