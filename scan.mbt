@@ -327,6 +327,24 @@ fn scan_assignments(
 }
 
 ///|
+/// Domain shape: at least three code units, no leading or trailing dot,
+/// and at least one interior dot.
+fn domain_shape_ok(text : String, from : Int, until : Int) -> Bool {
+  if until - from < 3 {
+    return false
+  }
+  if text[from].to_int() == 46 || text[until - 1].to_int() == 46 {
+    return false
+  }
+  for k = from; k < until; k = k + 1 {
+    if text[k].to_int() == 46 && k > from {
+      return true
+    }
+  }
+  false
+}
+
+///|
 fn scan_emails(text : String, out : Array[Finding]) -> Unit {
   for at = 1; at + 3 < text.length(); at = at + 1 {
     if text[at].to_int() == 64 {
@@ -343,12 +361,9 @@ fn scan_emails(text : String, out : Array[Finding]) -> Unit {
             ) {
         end += 1
       }
-      let domain = text[at + 1:end].to_owned()
-      if start < at &&
-        domain.length() >= 3 &&
-        domain.contains(".") &&
-        !domain.has_prefix(".") &&
-        !domain.has_suffix(".") {
+      // Inspect the domain in place: an allocation per '@' candidate would
+      // dominate the scan on address-heavy text.
+      if start < at && end - at >= 4 && domain_shape_ok(text, at + 1, end) {
         push_finding(out, Email, start, end, High)
       }
     }
