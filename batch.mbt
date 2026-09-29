@@ -34,10 +34,14 @@ pub fn redact_batch(
   policy? : ScanPolicy = ScanPolicy::standard(),
 ) -> BatchResult {
   let output : Array[String] = []
+  let changed_indices : Array[Int] = []
   let summary = empty_summary(lines.length())
-  for line in lines {
+  for index, line in lines {
     let result = redact(line, style~, policy~)
     output.push(result.text)
+    if result.changed {
+      changed_indices.push(index)
+    }
     if result.changed {
       summary.changed_lines += 1
     }
@@ -65,5 +69,5 @@ pub fn redact_batch(
       }
     }
   }
-  { lines: output, summary, }
+  { lines: output, summary, changed_indices, }
 }

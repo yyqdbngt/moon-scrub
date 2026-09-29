@@ -41,3 +41,13 @@ test "ten thousand log lines preserve count and deterministic totals" {
   assert_eq(result.summary.credentials, 2500)
   assert_eq(result.summary.ipv4s, 2500)
 }
+
+///|
+test "batch results report which line indices changed" {
+  let result = @moon_scrub.redact_batch([
+    "plain request", "password=hunter2", "another plain", "mail a@b.co",
+  ])
+  assert_eq(result.changed_indices.length(), 2)
+  assert_eq(result.changed_indices[0], 1)
+  assert_eq(result.changed_indices[1], 3)
+}

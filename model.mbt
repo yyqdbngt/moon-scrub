@@ -237,6 +237,9 @@ pub extend KindCount with @debug.Debug::{to_repr}
 pub(all) struct BatchResult {
   lines : Array[String]
   summary : BatchSummary
+  /// Zero-based indices of lines that changed, for callers that only need
+  /// to re-route or archive the affected records.
+  changed_indices : Array[Int]
 } derive(Eq, @debug.Debug)
 
 ///|
