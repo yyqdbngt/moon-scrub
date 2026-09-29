@@ -48,5 +48,7 @@ import {
   线性守门与 JSON 吞吐模式），native 实测批量 0.84 MB/s、wasm-gc 1.89 MB/s。
 - 历史完整性：五十个提交同一作者；推送保护触发过一次（测试样本形态与 Slack
   webhook 模式相同），以拆分字面量重写历史解决，未使用豁免链接。
-- MoonCakes 发布待办：`0.1.0` 已发布；`0.3.0` 需在具备发布凭据的环境执行
-  `moon publish` 后回填本节。
+- MoonCakes 发布待办：`0.1.0` 已发布。`0.3.0` 的 `moon publish --dry-run` 已在
+  2026-09-29 完成本地打包与解压复检（`Check passed`），服务端因当前环境凭据为
+  `123123213weqw` 与模块归属 `yyqdbngt` 不符返回 403；正式发布需在 `yyqdbngt`
+  登录态（`mooncake login`）下重跑 `moon publish` 后回填本节。
