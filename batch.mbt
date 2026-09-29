@@ -26,6 +26,50 @@ fn empty_summary(lines : Int) -> BatchSummary {
 }
 
 ///|
+/// Batch redaction under a full configuration, enabling post-0.1.0
+/// families such as resident ids and MAC addresses in log pipelines.
+pub fn redact_batch_with_config(
+  lines : Array[String],
+  config : ScanConfig,
+  style? : RedactionStyle = Typed,
+) -> BatchResult {
+  let output : Array[String] = []
+  let changed_indices : Array[Int] = []
+  let summary = empty_summary(lines.length())
+  for index, line in lines {
+    let result = redact_with_config(line, config, style~)
+    output.push(result.text)
+    if result.changed {
+      changed_indices.push(index)
+    }
+    summary.findings += result.findings.length()
+    for finding in result.findings {
+      match finding.kind {
+        AccessToken => summary.access_tokens += 1
+        BearerToken => summary.bearer_tokens += 1
+        Jwt => summary.jwts += 1
+        CredentialAssignment => summary.credentials += 1
+        Email => summary.emails += 1
+        Ipv4 => summary.ipv4s += 1
+        PaymentCard => summary.payment_cards += 1
+        PrivateKey => summary.private_keys += 1
+        UrlCredential => summary.url_credentials += 1
+        CustomSecret => summary.custom_secrets += 1
+        ResidentId => summary.resident_ids += 1
+        MacAddress => summary.mac_addresses += 1
+        Uuid => summary.uuids += 1
+        Ipv6 => summary.ipv6s += 1
+        Phone => summary.phones += 1
+        PublicKey => summary.public_keys += 1
+        WalletAddress => summary.wallet_addresses += 1
+        WebhookUrl => summary.webhook_urls += 1
+      }
+    }
+  }
+  { lines: output, summary, changed_indices, }
+}
+
+///|
 /// Redact independent log/API/prompt lines and return aggregate counts. The
 /// summary contains categories and counts only, never matched values.
 pub fn redact_batch(

@@ -51,3 +51,13 @@ test "batch results report which line indices changed" {
   assert_eq(result.changed_indices[0], 1)
   assert_eq(result.changed_indices[1], 3)
 }
+
+///|
+test "redact_batch_with_config enables new families in pipelines" {
+  let result = @moon_scrub.redact_batch_with_config(
+    ["id 110105199001010010", "plain"],
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(result.summary.resident_ids, 1)
+  assert_eq(result.lines[0], "id [REDACTED:RESIDENT_ID]")
+}
