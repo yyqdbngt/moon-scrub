@@ -25,8 +25,7 @@ test "partial or mixed-separator runs are not mac addresses" {
   // UUID-shaped hex is not a MAC address; with the UUID family enabled it
   // is reported once, as a UUID.
   let traced = @moon_scrub.scan_with_config(
-    "req 550e8400-e29b-41d4-a716-446655440000",
-    config,
+    "req 550e8400-e29b-41d4-a716-446655440000", config,
   )
   assert_eq(traced.length(), 1)
   assert_eq(traced[0].kind, @moon_scrub.Uuid)

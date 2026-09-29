@@ -29,8 +29,7 @@ test "uuid-like strings with wrong group lengths are ignored" {
   // A leading hyphen is an ordinary separator (request-id style); only hex
   // characters on the boundary suppress the match.
   let prefixed = @moon_scrub.scan_with_config(
-    "x-550e8400-e29b-41d4-a716-446655440000",
-    config,
+    "x-550e8400-e29b-41d4-a716-446655440000", config,
   )
   assert_eq(prefixed.length(), 1)
   assert_eq(prefixed[0].kind, @moon_scrub.Uuid)
