@@ -17,6 +17,7 @@ pub(all) enum SensitiveKind {
   Uuid
   Ipv6
   Phone
+  PublicKey
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -39,6 +40,7 @@ pub fn SensitiveKind::to_string(self : SensitiveKind) -> String {
     UrlCredential => "URL_CREDENTIAL"
     CustomSecret => "CUSTOM_SECRET"
     ResidentId => "RESIDENT_ID"
+    PublicKey => "PUBLIC_KEY"
     Phone => "PHONE"
     Ipv6 => "IPV6"
     Uuid => "UUID"
@@ -145,6 +147,7 @@ pub(all) struct BatchSummary {
   mut uuids : Int
   mut ipv6s : Int
   mut phones : Int
+  mut public_keys : Int
 } derive(Eq, @debug.Debug)
 
 ///|

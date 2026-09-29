@@ -728,3 +728,31 @@ test "vector: phone-off-by-default" {
   )
   assert_eq(findings.length(), 0)
 }
+
+///|
+test "vector: ssh-ed25519-public-key" {
+  let input = "deploy ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB8Qm4a1G5fz0OqYzKxBf5xDgrMV9NqBZQ4XwPx9kJkLmNoPqRsTuVwXyZaBcD4E5F6G7H8 ops@host"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "PUBLIC_KEY")
+  assert_eq(findings[0].start, 7)
+  assert_eq(findings[0].end, 114)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB8Qm4a1G5fz0OqYzKxBf5xDgrMV9NqBZQ4XwPx9kJkLmNoPqRsTuVwXyZaBcD4E5F6G7H8",
+  )
+}
+
+///|
+test "vector: ssh-short-body-rejected" {
+  let input = "stub ssh-rsa AAAAB3Nza short"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 0)
+}

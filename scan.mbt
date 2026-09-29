@@ -849,6 +849,28 @@ fn scan_phones(text : String, out : Array[Finding]) -> Unit {
 }
 
 ///|
+/// Public key material: `ssh-rsa`, `ssh-ed25519`, and `ecdsa-sha2-*` key
+/// lines whose base64 body is at least fifty characters. Public keys are not
+/// secrets, but they identify infrastructure and are flagged for hygiene.
+fn scan_public_keys(text : String, out : Array[Finding]) -> Unit {
+  let heads = ["ssh-rsa ", "ssh-ed25519 ", "ecdsa-sha2-"]
+  for i = 0; i < text.length(); i = i + 1 {
+    for head in heads {
+      if starts_at(text, i, head) {
+        let body_start = i + head.length()
+        let mut end = body_start
+        while end < text.length() && is_base64url(text[end].to_int()) {
+          end += 1
+        }
+        if end - body_start >= 50 {
+          push_finding(out, PublicKey, i, end, High)
+        }
+      }
+    }
+  }
+}
+
+///|
 fn run_detectors(
   text : String,
   config : ScanConfig,
@@ -883,6 +905,9 @@ fn run_detectors(
   }
   if config.detect_phone {
     scan_phones(text, out)
+  }
+  if config.detect_public_key {
+    scan_public_keys(text, out)
   }
   // Resident IDs outrank payment cards: an eighteen-digit checksummed
   // identity number is stronger evidence than a Luhn pass, and Mastercard

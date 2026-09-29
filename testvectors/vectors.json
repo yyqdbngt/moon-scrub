@@ -510,6 +510,24 @@
       "mode": "config",
       "input": "call +8613800138000 now",
       "expect": []
+    },
+    {
+      "name": "ssh-ed25519-public-key",
+      "mode": "config",
+      "input": "deploy ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB8Qm4a1G5fz0OqYzKxBf5xDgrMV9NqBZQ4XwPx9kJkLmNoPqRsTuVwXyZaBcD4E5F6G7H8 ops@host",
+      "expect": [
+        {
+          "kind": "PUBLIC_KEY",
+          "literal": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB8Qm4a1G5fz0OqYzKxBf5xDgrMV9NqBZQ4XwPx9kJkLmNoPqRsTuVwXyZaBcD4E5F6G7H8",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "ssh-short-body-rejected",
+      "mode": "config",
+      "input": "stub ssh-rsa AAAAB3Nza short",
+      "expect": []
     }
   ]
 }

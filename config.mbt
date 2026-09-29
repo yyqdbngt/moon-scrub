@@ -30,6 +30,7 @@ pub(all) struct ScanConfig {
   detect_ipv4 : Bool
   detect_payment_card : Bool
   detect_resident_id : Bool
+  detect_public_key : Bool
   detect_phone : Bool
   detect_ipv6 : Bool
   detect_uuid : Bool
@@ -59,6 +60,7 @@ pub fn ScanConfig::standard() -> ScanConfig {
     detect_ipv4: true,
     detect_payment_card: true,
     detect_resident_id: true,
+    detect_public_key: true,
     detect_phone: false,
     detect_ipv6: true,
     detect_uuid: true,
@@ -79,6 +81,7 @@ pub fn ScanConfig::secrets_only() -> ScanConfig {
     detect_ipv4: false,
     detect_payment_card: false,
     detect_resident_id: false,
+    detect_public_key: false,
     detect_phone: false,
     detect_ipv6: false,
     detect_uuid: false,
