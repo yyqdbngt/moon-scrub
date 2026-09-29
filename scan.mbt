@@ -968,6 +968,56 @@ fn scan_wallet_addresses(text : String, out : Array[Finding]) -> Unit {
 }
 
 ///|
+/// Incoming-webhook URLs: Slack `hooks.slack.com/services/T.../B.../token`
+/// and Discord `discord.com/api/webhooks/<id>/<token>`. The path structure
+/// and segment shapes are validated, not just the host name.
+fn scan_webhook_urls(text : String, out : Array[Finding]) -> Unit {
+  let lower = ascii_lower(text)
+  let anchors = ["hooks.slack.com/services/", "discord.com/api/webhooks/"]
+  for i = 0; i < text.length(); i = i + 1 {
+    for anchor in anchors {
+      if starts_at(lower, i, anchor) {
+        let start = i
+        let mut end = i + anchor.length()
+        let mut segments = 1
+        let mut seg_start = end
+        let mut shapes_ok = true
+        let seg_lengths : Array[Int] = []
+        while end < text.length() {
+          let c = text[end].to_int()
+          if is_ascii_alnum(c) || c == 45 || c == 95 {
+            end += 1
+          } else if c == 47 && segments < 4 {
+            seg_lengths.push(end - seg_start)
+            segments += 1
+            end += 1
+            seg_start = end
+          } else {
+            break
+          }
+        }
+        seg_lengths.push(end - seg_start)
+        if anchor == "hooks.slack.com/services/" {
+          shapes_ok = segments == 3 &&
+            seg_lengths[0] >= 8 &&
+            seg_lengths[0] <= 12 &&
+            seg_lengths[1] >= 8 &&
+            seg_lengths[1] <= 12 &&
+            seg_lengths[2] >= 20
+        } else {
+          shapes_ok = segments == 2 &&
+            seg_lengths[0] >= 17 &&
+            seg_lengths[1] >= 50
+        }
+        if shapes_ok {
+          push_finding(out, WebhookUrl, start, end, High)
+        }
+      }
+    }
+  }
+}
+
+///|
 fn run_detectors(
   text : String,
   config : ScanConfig,
@@ -1008,6 +1058,9 @@ fn run_detectors(
   }
   if config.detect_wallet {
     scan_wallet_addresses(text, out)
+  }
+  if config.detect_webhook {
+    scan_webhook_urls(text, out)
   }
   // Resident IDs outrank payment cards: an eighteen-digit checksummed
   // identity number is stronger evidence than a Luhn pass, and Mastercard

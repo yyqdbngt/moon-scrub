@@ -570,6 +570,24 @@
       "mode": "config",
       "input": "hex 0xdeadbeef nope",
       "expect": []
+    },
+    {
+      "name": "webhook-discord",
+      "mode": "config",
+      "input": "hit https://discord.com/api/webhooks/123456789012345678/abcdefghijklmnopqrstabcdefghijklmnopqrstabcdefghijklmnopqrst tail",
+      "expect": [
+        {
+          "kind": "WEBHOOK_URL",
+          "literal": "discord.com/api/webhooks/123456789012345678/abcdefghijklmnopqrstabcdefghijklmnopqrstabcdefghijklmnopqrst",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "webhook-malformed-rejected",
+      "mode": "config",
+      "input": "x https://hooks.slack.com/services/T00/B00/short",
+      "expect": []
     }
   ]
 }

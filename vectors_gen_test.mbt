@@ -820,3 +820,31 @@ test "vector: wallet-short-hex-rejected" {
   )
   assert_eq(findings.length(), 0)
 }
+
+///|
+test "vector: webhook-discord" {
+  let input = "hit https://discord.com/api/webhooks/123456789012345678/abcdefghijklmnopqrstabcdefghijklmnopqrstabcdefghijklmnopqrst tail"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "WEBHOOK_URL")
+  assert_eq(findings[0].start, 12)
+  assert_eq(findings[0].end, 116)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "discord.com/api/webhooks/123456789012345678/abcdefghijklmnopqrstabcdefghijklmnopqrstabcdefghijklmnopqrst",
+  )
+}
+
+///|
+test "vector: webhook-malformed-rejected" {
+  let input = "x https://hooks.slack.com/services/T00/B00/short"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 0)
+}
