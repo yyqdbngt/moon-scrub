@@ -11,7 +11,7 @@
 struct ChunkScanner {
   config : ScanConfig
   overlap : Int
-  mut buffer : String
+  mut buffer : StringBuilder
   mut base : Int
   mut finished : Bool
 }
@@ -29,7 +29,7 @@ pub fn ChunkScanner::new(
     } else {
       overlap
     },
-    buffer: "",
+    buffer: StringBuilder(),
     base: 0,
     finished: false,
   }
@@ -46,12 +46,13 @@ pub fn ChunkScanner::push(
   if self.finished || chunk.length() == 0 {
     return []
   }
-  self.buffer += chunk
-  let limit = self.buffer.length() - self.overlap
-  if limit <= 0 {
+  self.buffer.write_string(chunk)
+  let window = self.buffer.to_string()
+  if window.length() <= self.overlap {
     return []
   }
-  let findings = scan_with_config(self.buffer, self.config)
+  let limit = window.length() - self.overlap
+  let findings = scan_with_config(window, self.config)
   let settled : Array[Finding] = []
   let mut drop = limit
   for finding in findings {
@@ -70,7 +71,9 @@ pub fn ChunkScanner::push(
   // `scan_with_config` returns disjoint, start-ordered findings, so dropping
   // through the last settled end can never cut into a pending match.
   self.base += drop
-  self.buffer = self.buffer[drop:].to_owned()
+  let kept = window[drop:].to_owned()
+  self.buffer = StringBuilder()
+  self.buffer.write_string(kept)
   settled
 }
 
@@ -97,7 +100,7 @@ pub fn ChunkScanner::finish(self : ChunkScanner) -> Array[Finding] {
     return []
   }
   self.finished = true
-  let findings = scan_with_config(self.buffer, self.config)
+  let findings = scan_with_config(self.buffer.to_string(), self.config)
   let out : Array[Finding] = []
   for finding in findings {
     out.push({
@@ -107,7 +110,7 @@ pub fn ChunkScanner::finish(self : ChunkScanner) -> Array[Finding] {
       confidence: finding.confidence,
     })
   }
-  self.buffer = ""
+  self.buffer = StringBuilder()
   self.base = 0
   out
 }
