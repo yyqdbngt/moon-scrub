@@ -65,6 +65,14 @@ pub extend Confidence with Eq::{equal, not_equal}
 pub extend Confidence with @debug.Debug::{to_repr}
 
 ///|
+pub fn Confidence::to_string(self : Confidence) -> String {
+  match self {
+    High => "HIGH"
+    Medium => "MEDIUM"
+  }
+}
+
+///|
 /// Half-open UTF-16 offsets. A finding never stores or returns the matched
 /// value, making reports safer to log than the original input.
 pub(all) struct Finding {

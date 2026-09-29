@@ -1243,10 +1243,6 @@ pub fn explain(
 ) -> Array[String] {
   let lines : Array[String] = []
   for finding in scan_with_config(text, config) {
-    let confidence = match finding.confidence {
-      High => "HIGH"
-      Medium => "MEDIUM"
-    }
     lines.push(
       finding.kind.to_string() +
       " " +
@@ -1254,7 +1250,7 @@ pub fn explain(
       "-" +
       finding.end.to_string() +
       " " +
-      confidence,
+      finding.confidence.to_string(),
     )
   }
   lines
