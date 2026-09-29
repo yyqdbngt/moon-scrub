@@ -3,7 +3,8 @@ test "slack and discord webhook urls are high-confidence findings" {
   let config = @moon_scrub.ScanConfig::standard()
   let slack = @moon_scrub.scan_with_config(
     "post https://hooks" +
-      ".slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX" + " done",
+    ".slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX" +
+    " done",
     config,
   )
   assert_eq(slack.length(), 1)
@@ -28,8 +29,7 @@ test "webhook urls with wrong segment shapes are ignored" {
   )
   assert_eq(
     @moon_scrub.scan_with_config(
-      "x https://discord.com/api/webhooks/123/token",
-      config,
+      "x https://discord.com/api/webhooks/123/token", config,
     ).length(),
     0,
   )

@@ -96,6 +96,23 @@ pub fn ScanConfig::secrets_only() -> ScanConfig {
 }
 
 ///|
+/// Only the personal-identifier families run; every credential detector is
+/// off. Useful for telemetry scrubbing where secrets are handled elsewhere.
+pub fn ScanConfig::pii_only() -> ScanConfig {
+  {
+    ..ScanConfig::standard(),
+    detect_access_token: false,
+    detect_bearer: false,
+    detect_jwt: false,
+    detect_private_key: false,
+    detect_url_credential: false,
+    detect_assignment: false,
+    detect_public_key: false,
+    detect_webhook: false,
+  }
+}
+
+///|
 /// Bridge the small `ScanPolicy` surface onto the full configuration so older
 /// call sites keep their semantics, including the new suppressors.
 fn ScanPolicy::to_config(self : ScanPolicy) -> ScanConfig {
