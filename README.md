@@ -82,6 +82,27 @@ moon run examples/log-pipeline --target js
 moon run examples/bench --target native   # 吞吐与线性守门报告
 ```
 
+## 检测器矩阵
+
+| 家族 | 类型 | 默认（ScanConfig::standard） | 说明 |
+|---|---|---|---|
+| 访问令牌前缀 | 凭据 | 开 | GitHub/GitLab/Slack/AWS/Google/Stripe/Anthropic/OpenAI/SendGrid/Doppler/npm 等 28 种前缀 |
+| Bearer / Basic / JWT | 凭据 | 开 | 含 marker 幂等跳过 |
+| 私钥 PEM 块 | 凭据 | 开 | PKCS#8/RSA/EC/OpenSSH/ENCRYPTED/PGP/DSA |
+| URL 内嵌凭据 | 凭据 | 开 | scheme://user:pass@host |
+| 敏感键赋值 | 凭据 | 开 | password/token/api_key 等 22 个键名 |
+| Slack/Discord webhook | 凭据 | 开 | 路径结构校验 |
+| 邮箱 | 标识 | 开 | |
+| IPv4 / IPv6 | 标识 | 开 | 含版本形态抑制 |
+| 支付卡 | 标识 | 开 | Luhn + 主流 BIN 前缀 |
+| 身份证（GB 11643） | 标识 | 开 | 校验和 + 生日校验 |
+| MAC / UUID | 标识 | 开 | Medium 置信 |
+| SSH 公钥 / 证书块 | 标识 | 开 | 卫生标记，非秘密 |
+| 钱包地址 | 标识 | 开 | 形态匹配，无校验和 |
+| 电话（E.164） | 标识 | 关 | 显式开启 detect_phone |
+
+`ScanPolicy`（0.1.0 兼容面）只含凭据 + 邮箱/IPv4/卡号；新家族通过 `ScanConfig` 使用。
+
 ## 安全边界
 
 这是确定性的结构化检测工具，不是完整 DLP、NLP 实体识别器或合规认证产品。它可能出现
