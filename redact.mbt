@@ -79,6 +79,25 @@ pub fn verify_clean(
 
 ///|
 /// Return true only when a fresh configured scan finds nothing.
+
+///|
+/// Redact while sparing caller-certified literals, such as a load balancer
+/// IP that is safe to publish. Everything else runs under the given config.
+pub fn redact_except(
+  text : String,
+  keep : Array[String],
+  style? : RedactionStyle = Typed,
+  config? : ScanConfig = ScanConfig::standard(),
+) -> RedactionResult {
+  let findings = scan_except(text, keep, config~)
+  {
+    text: redact_with_findings(text, findings, style),
+    findings,
+    changed: findings.length() > 0,
+  }
+}
+
+///|
 pub fn verify_clean_with_config(text : String, config : ScanConfig) -> Bool {
   scan_with_config(text, config).length() == 0
 }

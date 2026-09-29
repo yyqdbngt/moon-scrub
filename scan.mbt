@@ -1190,6 +1190,48 @@ pub fn findings_summary(
 }
 
 ///|
+
+///|
+/// Scan while keeping caller-certified literals in place: any finding that
+/// overlaps a kept literal is dropped. Keep values shorter than four code
+/// units are ignored so a tiny string cannot neuter whole families.
+pub fn scan_except(
+  text : String,
+  keep : Array[String],
+  config? : ScanConfig = ScanConfig::standard(),
+) -> Array[Finding] {
+  let findings = scan_with_config(text, config)
+  let kept : Array[(Int, Int)] = []
+  for literal in keep {
+    if literal.length() >= 4 {
+      let mut i = 0
+      while i + literal.length() <= text.length() {
+        if starts_at(text, i, literal) {
+          kept.push((i, i + literal.length()))
+          i += literal.length()
+        } else {
+          i += 1
+        }
+      }
+    }
+  }
+  let out : Array[Finding] = []
+  for finding in findings {
+    let mut overlap = false
+    for span in kept {
+      if finding.start < span.1 && finding.end > span.0 {
+        overlap = true
+        break
+      }
+    }
+    if !overlap {
+      out.push(finding)
+    }
+  }
+  out
+}
+
+///|
 pub fn scan_full(
   text : String,
   rules : Array[CustomRule],
