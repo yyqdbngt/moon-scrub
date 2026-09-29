@@ -535,6 +535,106 @@ fn non_overlapping(items : Array[Finding]) -> Array[Finding] {
 }
 
 ///|
+fn days_in_month(year : Int, month : Int) -> Int {
+  match month {
+    1 | 3 | 5 | 7 | 8 | 10 | 12 => 31
+    4 | 6 | 9 | 11 => 30
+    _ =>
+      if year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) {
+        29
+      } else {
+        28
+      }
+  }
+}
+
+///|
+fn two_digits(text : String, at : Int) -> Int {
+  (text[at].to_int() - 48) * 10 + (text[at + 1].to_int() - 48)
+}
+
+///|
+fn four_digits(text : String, at : Int) -> Int {
+  let mut value = 0
+  for k = 0; k < 4; k = k + 1 {
+    value = value * 10 + text[at + k].to_int() - 48
+  }
+  value
+}
+
+///|
+/// The birth-date segment must name a calendar date between 1900 and 2100;
+/// checksum-valid strings like a fabricated 2001-02-29 are rejected here.
+fn resident_id_birth_ok(text : String, start : Int) -> Bool {
+  let year = four_digits(text, start + 6)
+  let month = two_digits(text, start + 10)
+  let day = two_digits(text, start + 12)
+  year >= 1900 &&
+  year <= 2100 &&
+  month >= 1 &&
+  month <= 12 &&
+  day >= 1 &&
+  day <= days_in_month(year, month)
+}
+
+///|
+/// GB 11643-1999 check digit: weighted sum of the first 17 digits under
+/// weights 7 9 10 5 8 4 2 1 6 3 7 9 10 5 8 4 2, mapped through `10X98765432`.
+fn resident_id_checksum_ok(text : String, start : Int) -> Bool {
+  let weights = [
+    7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2,
+  ]
+  let order = "10X98765432"
+  let mut sum = 0
+  for k = 0; k < 17; k = k + 1 {
+    sum += (text[start + k].to_int() - 48) * weights[k]
+  }
+  text[start + 17] == order[sum % 11]
+}
+
+///|
+/// Chinese resident identity numbers: eighteen characters, seventeen digits
+/// plus a check digit that may be X. Both the checksum and the embedded
+/// birth date must validate, which keeps ordinary 18-digit order numbers
+/// from being reported.
+fn scan_resident_ids(text : String, out : Array[Finding]) -> Unit {
+  let mut i = 0
+  while i + 18 <= text.length() {
+    if is_ascii_digit(text[i].to_int()) &&
+      (i == 0 || !is_ascii_alnum(text[i - 1].to_int())) {
+      let end = i + 18
+      let last = text[end - 1].to_int()
+      let shaped = (if is_ascii_digit(last) || last == 88 || last == 120 {
+        let mut k = i
+        while k < end - 1 && is_ascii_digit(text[k].to_int()) {
+          k += 1
+        }
+        k == end - 1
+      } else {
+        false
+      })
+      let tail_free = end >= text.length() ||
+        (
+          !is_ascii_alnum(text[end].to_int()) &&
+          text[end].to_int() != 45 &&
+          text[end].to_int() != 95
+        )
+      if shaped &&
+        tail_free &&
+        resident_id_checksum_ok(text, i) &&
+        resident_id_birth_ok(text, i) {
+        push_finding(out, ResidentId, i, end, High)
+        i = end
+      } else {
+        i += 1
+      }
+    } else {
+      i += 1
+    }
+  }
+}
+
+///|
 fn run_detectors(
   text : String,
   config : ScanConfig,
@@ -563,6 +663,12 @@ fn run_detectors(
   }
   if config.detect_ipv4 {
     scan_ipv4(text, config.suppress_version_ipv4, out)
+  }
+  // Resident IDs outrank payment cards: an eighteen-digit checksummed
+  // identity number is stronger evidence than a Luhn pass, and Mastercard
+  // BINs (51-55) overlap common area codes.
+  if config.detect_resident_id {
+    scan_resident_ids(text, out)
   }
   if config.detect_payment_card {
     scan_cards(text, config.require_known_card_prefix, out)

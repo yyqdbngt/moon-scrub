@@ -12,6 +12,7 @@ pub(all) enum SensitiveKind {
   PrivateKey
   UrlCredential
   CustomSecret
+  ResidentId
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -33,6 +34,7 @@ pub fn SensitiveKind::to_string(self : SensitiveKind) -> String {
     PrivateKey => "PRIVATE_KEY"
     UrlCredential => "URL_CREDENTIAL"
     CustomSecret => "CUSTOM_SECRET"
+    ResidentId => "RESIDENT_ID"
   }
 }
 
@@ -130,6 +132,7 @@ pub(all) struct BatchSummary {
   mut private_keys : Int
   mut url_credentials : Int
   mut custom_secrets : Int
+  mut resident_ids : Int
 } derive(Eq, @debug.Debug)
 
 ///|

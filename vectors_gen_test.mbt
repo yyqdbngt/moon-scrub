@@ -489,3 +489,41 @@ test "vector: short-prefixed-runs-ignored" {
   )
   assert_eq(findings.length(), 0)
 }
+
+///|
+test "vector: resident-id-valid" {
+  let input = "customer 110105199001010010 checked"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "RESIDENT_ID")
+  assert_eq(findings[0].start, 9)
+  assert_eq(findings[0].end, 27)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "110105199001010010",
+  )
+}
+
+///|
+test "vector: resident-id-bad-checksum" {
+  let input = "id 110105199001010011 rejected"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 0)
+}
+
+///|
+test "vector: resident-id-impossible-date" {
+  let input = "id 110105200102290010 rejected"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 0)
+}

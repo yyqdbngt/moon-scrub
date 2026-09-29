@@ -82,7 +82,13 @@ def emit(doc) -> str:
     ]
     for vector in doc["vectors"]:
         mode = vector["mode"]
-        if mode == "secrets":
+        if mode == "config":
+            scan_call = call_expr(
+                "  ",
+                "let findings = @moon_scrub.scan_with_config",
+                ["input", "@moon_scrub.ScanConfig::standard()"],
+            )
+        elif mode == "secrets":
             scan_call = call_expr(
                 "  ",
                 "let findings = @moon_scrub.scan",

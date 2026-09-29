@@ -29,6 +29,7 @@ pub(all) struct ScanConfig {
   detect_email : Bool
   detect_ipv4 : Bool
   detect_payment_card : Bool
+  detect_resident_id : Bool
   suppress_version_ipv4 : Bool
   require_known_card_prefix : Bool
   extra_prefixes : Array[TokenPrefixRule]
@@ -53,6 +54,7 @@ pub fn ScanConfig::standard() -> ScanConfig {
     detect_email: true,
     detect_ipv4: true,
     detect_payment_card: true,
+    detect_resident_id: true,
     suppress_version_ipv4: true,
     require_known_card_prefix: true,
     extra_prefixes: [],
@@ -68,6 +70,7 @@ pub fn ScanConfig::secrets_only() -> ScanConfig {
     detect_email: false,
     detect_ipv4: false,
     detect_payment_card: false,
+    detect_resident_id: false,
   }
 }
 
@@ -76,7 +79,7 @@ pub fn ScanConfig::secrets_only() -> ScanConfig {
 /// call sites keep their semantics, including the new suppressors.
 fn ScanPolicy::to_config(self : ScanPolicy) -> ScanConfig {
   {
-    ..ScanConfig::standard(),
+    ..ScanConfig::secrets_only(),
     detect_email: self.detect_email,
     detect_ipv4: self.detect_ipv4,
     detect_payment_card: self.detect_payment_card,

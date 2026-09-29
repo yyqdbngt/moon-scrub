@@ -8,7 +8,11 @@
       "mode": "secrets",
       "input": "token=ghp_1234567890abcdefghij",
       "expect": [
-        { "kind": "ACCESS_TOKEN", "literal": "ghp_1234567890abcdefghij", "confidence": "HIGH" }
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "ghp_1234567890abcdefghij",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -16,7 +20,11 @@
       "mode": "secrets",
       "input": "deploy github_pat_19gjdks8Dhdf7sKJ9mnbVfx4",
       "expect": [
-        { "kind": "ACCESS_TOKEN", "literal": "github_pat_19gjdks8Dhdf7sKJ9mnbVfx4", "confidence": "HIGH" }
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "github_pat_19gjdks8Dhdf7sKJ9mnbVfx4",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -24,7 +32,11 @@
       "mode": "secrets",
       "input": "auth ghs_abcdefghijklmnopqrstuvwxyz12",
       "expect": [
-        { "kind": "ACCESS_TOKEN", "literal": "ghs_abcdefghijklmnopqrstuvwxyz12", "confidence": "HIGH" }
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "ghs_abcdefghijklmnopqrstuvwxyz12",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -32,7 +44,11 @@
       "mode": "secrets",
       "input": "ci glpat-abcdefghijklmnopqrst",
       "expect": [
-        { "kind": "ACCESS_TOKEN", "literal": "glpat-abcdefghijklmnopqrst", "confidence": "HIGH" }
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "glpat-abcdefghijklmnopqrst",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -40,7 +56,11 @@
       "mode": "secrets",
       "input": "slack=xoxb-123456789012-123456789012-abcdefghij",
       "expect": [
-        { "kind": "ACCESS_TOKEN", "literal": "xoxb-123456789012-123456789012-abcdefghij", "confidence": "HIGH" }
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "xoxb-123456789012-123456789012-abcdefghij",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -48,7 +68,11 @@
       "mode": "secrets",
       "input": "key AKIAIOSFODNN7EXAMPLE end",
       "expect": [
-        { "kind": "ACCESS_TOKEN", "literal": "AKIAIOSFODNN7EXAMPLE", "confidence": "HIGH" }
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "AKIAIOSFODNN7EXAMPLE",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -56,7 +80,11 @@
       "mode": "secrets",
       "input": "google AIzaSyA1234567890abcdefghij maps",
       "expect": [
-        { "kind": "ACCESS_TOKEN", "literal": "AIzaSyA1234567890abcdefghij", "confidence": "HIGH" }
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "AIzaSyA1234567890abcdefghij",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -64,7 +92,11 @@
       "mode": "secrets",
       "input": "stripe sk_live_abcdefghijklmnopqrst charge",
       "expect": [
-        { "kind": "ACCESS_TOKEN", "literal": "sk_live_abcdefghijklmnopqrst", "confidence": "HIGH" }
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "sk_live_abcdefghijklmnopqrst",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -72,7 +104,11 @@
       "mode": "secrets",
       "input": "llm sk-ant-api03-abcdefghijklmnop call",
       "expect": [
-        { "kind": "ACCESS_TOKEN", "literal": "sk-ant-api03-abcdefghijklmnop", "confidence": "HIGH" }
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "sk-ant-api03-abcdefghijklmnop",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -80,7 +116,11 @@
       "mode": "secrets",
       "input": "gpt sk-proj-abcdefghijklmnopqrst",
       "expect": [
-        { "kind": "ACCESS_TOKEN", "literal": "sk-proj-abcdefghijklmnopqrst", "confidence": "HIGH" }
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "sk-proj-abcdefghijklmnopqrst",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -88,7 +128,11 @@
       "mode": "secrets",
       "input": "mail SG.abcdefghijklmnop.qrstuvwxyz123456",
       "expect": [
-        { "kind": "ACCESS_TOKEN", "literal": "SG.abcdefghijklmnop.qrstuvwxyz123456", "confidence": "HIGH" }
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "SG.abcdefghijklmnop.qrstuvwxyz123456",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -96,7 +140,11 @@
       "mode": "secrets",
       "input": "publish npm_abcdefghijklmnopqrstuvwxyz1234",
       "expect": [
-        { "kind": "ACCESS_TOKEN", "literal": "npm_abcdefghijklmnopqrstuvwxyz1234", "confidence": "HIGH" }
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "npm_abcdefghijklmnopqrstuvwxyz1234",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -104,7 +152,11 @@
       "mode": "secrets",
       "input": "doppler dop_v1_abcdef1234567890abcdef12",
       "expect": [
-        { "kind": "ACCESS_TOKEN", "literal": "dop_v1_abcdef1234567890abcdef12", "confidence": "HIGH" }
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "dop_v1_abcdef1234567890abcdef12",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -112,7 +164,11 @@
       "mode": "secrets",
       "input": "authorization: Bearer abcdefghijklmnop",
       "expect": [
-        { "kind": "BEARER_TOKEN", "literal": "abcdefghijklmnop", "confidence": "HIGH" }
+        {
+          "kind": "BEARER_TOKEN",
+          "literal": "abcdefghijklmnop",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -120,7 +176,11 @@
       "mode": "secrets",
       "input": "jwt=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.signature",
       "expect": [
-        { "kind": "JWT", "literal": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.signature", "confidence": "HIGH" }
+        {
+          "kind": "JWT",
+          "literal": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.signature",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -128,7 +188,11 @@
       "mode": "secrets",
       "input": "-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAAS\\n-----END PRIVATE KEY-----",
       "expect": [
-        { "kind": "PRIVATE_KEY", "literal": "-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAAS\\n-----END PRIVATE KEY-----", "confidence": "HIGH" }
+        {
+          "kind": "PRIVATE_KEY",
+          "literal": "-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAAS\\n-----END PRIVATE KEY-----",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -136,7 +200,11 @@
       "mode": "secrets",
       "input": "postgres://alice:s3cret@db.example/app",
       "expect": [
-        { "kind": "URL_CREDENTIAL", "literal": "alice:s3cret", "confidence": "HIGH" }
+        {
+          "kind": "URL_CREDENTIAL",
+          "literal": "alice:s3cret",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -144,7 +212,11 @@
       "mode": "secrets",
       "input": "password=hunter2 ok",
       "expect": [
-        { "kind": "CREDENTIAL", "literal": "hunter2", "confidence": "HIGH" }
+        {
+          "kind": "CREDENTIAL",
+          "literal": "hunter2",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -152,7 +224,11 @@
       "mode": "secrets",
       "input": "secret: \"world value\" done",
       "expect": [
-        { "kind": "CREDENTIAL", "literal": "world value", "confidence": "HIGH" }
+        {
+          "kind": "CREDENTIAL",
+          "literal": "world value",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -160,7 +236,11 @@
       "mode": "standard",
       "input": "mail demo@example.com stop",
       "expect": [
-        { "kind": "EMAIL", "literal": "demo@example.com", "confidence": "HIGH" }
+        {
+          "kind": "EMAIL",
+          "literal": "demo@example.com",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -168,7 +248,11 @@
       "mode": "standard",
       "input": "connect 192.168.1.20 now",
       "expect": [
-        { "kind": "IPV4", "literal": "192.168.1.20", "confidence": "MEDIUM" }
+        {
+          "kind": "IPV4",
+          "literal": "192.168.1.20",
+          "confidence": "MEDIUM"
+        }
       ]
     },
     {
@@ -176,7 +260,11 @@
       "mode": "standard",
       "input": "peer 10.0.0.8. down",
       "expect": [
-        { "kind": "IPV4", "literal": "10.0.0.8", "confidence": "MEDIUM" }
+        {
+          "kind": "IPV4",
+          "literal": "10.0.0.8",
+          "confidence": "MEDIUM"
+        }
       ]
     },
     {
@@ -196,7 +284,11 @@
       "mode": "standard",
       "input": "card 4111 1111 1111 1111 end",
       "expect": [
-        { "kind": "PAYMENT_CARD", "literal": "4111 1111 1111 1111", "confidence": "HIGH" }
+        {
+          "kind": "PAYMENT_CARD",
+          "literal": "4111 1111 1111 1111",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -204,7 +296,11 @@
       "mode": "standard",
       "input": "amex 378282246310005 end",
       "expect": [
-        { "kind": "PAYMENT_CARD", "literal": "378282246310005", "confidence": "HIGH" }
+        {
+          "kind": "PAYMENT_CARD",
+          "literal": "378282246310005",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -230,9 +326,21 @@
       "mode": "standard",
       "input": "demo@example.com 10.0.0.1 4111111111111111",
       "expect": [
-        { "kind": "EMAIL", "literal": "demo@example.com", "confidence": "HIGH" },
-        { "kind": "IPV4", "literal": "10.0.0.1", "confidence": "MEDIUM" },
-        { "kind": "PAYMENT_CARD", "literal": "4111111111111111", "confidence": "HIGH" }
+        {
+          "kind": "EMAIL",
+          "literal": "demo@example.com",
+          "confidence": "HIGH"
+        },
+        {
+          "kind": "IPV4",
+          "literal": "10.0.0.1",
+          "confidence": "MEDIUM"
+        },
+        {
+          "kind": "PAYMENT_CARD",
+          "literal": "4111111111111111",
+          "confidence": "HIGH"
+        }
       ]
     },
     {
@@ -245,6 +353,30 @@
       "name": "short-prefixed-runs-ignored",
       "mode": "secrets",
       "input": "key=AIza123 and sk-abc",
+      "expect": []
+    },
+    {
+      "name": "resident-id-valid",
+      "mode": "config",
+      "input": "customer 110105199001010010 checked",
+      "expect": [
+        {
+          "kind": "RESIDENT_ID",
+          "literal": "110105199001010010",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "resident-id-bad-checksum",
+      "mode": "config",
+      "input": "id 110105199001010011 rejected",
+      "expect": []
+    },
+    {
+      "name": "resident-id-impossible-date",
+      "mode": "config",
+      "input": "id 110105200102290010 rejected",
       "expect": []
     }
   ]
