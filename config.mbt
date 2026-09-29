@@ -39,6 +39,10 @@ pub(all) struct ScanConfig {
   detect_mac : Bool
   suppress_version_ipv4 : Bool
   require_known_card_prefix : Bool
+  /// Drop email findings on IANA-reserved documentation domains
+  /// (example.com/net/org and the TLDs .test/.example/.invalid), which
+  /// dominate test-suite output and drown real findings.
+  suppress_example_domains : Bool
   extra_prefixes : Array[TokenPrefixRule]
 } derive(Eq, @debug.Debug)
 
@@ -71,6 +75,7 @@ pub fn ScanConfig::standard() -> ScanConfig {
     detect_mac: true,
     suppress_version_ipv4: true,
     require_known_card_prefix: true,
+    suppress_example_domains: false,
     extra_prefixes: [],
   }
 }

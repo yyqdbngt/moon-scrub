@@ -41,6 +41,42 @@ fn non_overlapping(items : Array[Finding]) -> Array[Finding] {
 }
 
 ///|
+/// Remove email findings whose domain is an IANA-reserved documentation
+/// domain: example.com/net/org plus the test/example/invalid TLDs.
+fn filter_example_domains(text : String, out : Array[Finding]) -> Unit {
+  let keep : Array[Finding] = []
+  for finding in out {
+    if finding.kind == Email && is_example_domain(text, finding) {
+      continue
+    }
+    keep.push(finding)
+  }
+  out.clear()
+  for finding in keep {
+    out.push(finding)
+  }
+}
+
+///|
+fn is_example_domain(text : String, finding : Finding) -> Bool {
+  // Walk back from the '@' recorded inside the finding range.
+  let mut at = finding.end - 1
+  while at > finding.start && text[at].to_int() != 64 {
+    at -= 1
+  }
+  if text[at].to_int() != 64 {
+    return false
+  }
+  let domain = ascii_lower(text[at + 1:finding.end].to_owned())
+  domain == "example.com" ||
+  domain == "example.net" ||
+  domain == "example.org" ||
+  domain == "test" ||
+  domain == "example" ||
+  domain == "invalid"
+}
+
+///|
 fn run_detectors(
   text : String,
   config : ScanConfig,
@@ -70,6 +106,9 @@ fn run_detectors(
   }
   if config.detect_email {
     scan_emails(text, out)
+    if config.suppress_example_domains {
+      filter_example_domains(text, out)
+    }
   }
   if config.detect_ipv4 {
     scan_ipv4(text, config.suppress_version_ipv4, out)
