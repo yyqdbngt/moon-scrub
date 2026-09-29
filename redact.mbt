@@ -98,6 +98,19 @@ pub fn redact_except(
 }
 
 ///|
+
+///|
+/// Return true only when neither built-in detectors under the configuration
+/// nor caller-supplied exact-value rules find anything.
+pub fn verify_clean_with_rules(
+  text : String,
+  rules : Array[CustomRule],
+  config? : ScanConfig = ScanConfig::standard(),
+) -> Bool {
+  scan_full(text, rules, config).length() == 0
+}
+
+///|
 pub fn verify_clean_with_config(text : String, config : ScanConfig) -> Bool {
   scan_with_config(text, config).length() == 0
 }

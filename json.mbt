@@ -120,6 +120,7 @@ fn walk_json(
   config : ScanConfig,
   style : RedactionStyle,
   findings : Array[JsonFinding],
+  rules : Array[CustomRule],
 ) -> (Json, Int) {
   match value {
     String(text) => {
@@ -134,7 +135,7 @@ fn walk_json(
           },
         ]
       } else {
-        scan_with_config(text, config)
+        scan_full(text, rules, config)
       }
       if leaf.length() == 0 {
         return (value, 0)
@@ -154,6 +155,7 @@ fn walk_json(
           config,
           style,
           findings,
+          rules,
         )
         rebuilt.push(item)
         changed += count
@@ -169,7 +171,14 @@ fn walk_json(
       for key in keys {
         let child = map.get(key)
         let (item, count) = if child is Some(child_json) {
-          walk_json(child_json, path + "/" + key, config, style, findings)
+          walk_json(
+            child_json,
+            path + "/" + key,
+            config,
+            style,
+            findings,
+            rules,
+          )
         } else {
           (Json::null(), 0)
         }
@@ -187,6 +196,57 @@ fn walk_json(
 /// structured field. Malformed input fails closed: it is redacted as plain
 /// text with `parsed` set to false. Output is compact and deterministic;
 /// object keys are re-emitted in sorted order.
+
+///|
+/// redact_json with caller-supplied exact-value rules applied to every
+/// string leaf in addition to the configured detectors.
+pub fn redact_json_with_rules(
+  text : String,
+  rules : Array[CustomRule],
+  config? : ScanConfig = ScanConfig::standard(),
+  style? : RedactionStyle = Typed,
+) -> JsonRedactionResult {
+  let outcome = try @json.parse(text) catch {
+    _ => None
+  } noraise {
+    doc => Some(doc)
+  }
+  match outcome {
+    Some(doc) => {
+      let findings : Array[JsonFinding] = []
+      let (rebuilt, changed) = walk_json(
+        doc, "", config, style, findings, rules,
+      )
+      let buf = StringBuilder()
+      write_json_value(rebuilt, buf)
+      {
+        text: buf.to_string(),
+        changed_fields: changed,
+        findings,
+        parsed: true,
+      }
+    }
+    None => {
+      let plain = redact_full(text, rules, config, style~)
+      let findings : Array[JsonFinding] = []
+      for finding in plain.findings {
+        findings.push({ path: "", finding, })
+      }
+      {
+        text: plain.text,
+        changed_fields: if plain.changed {
+          1
+        } else {
+          0
+        },
+        findings,
+        parsed: false,
+      }
+    }
+  }
+}
+
+///|
 pub fn redact_json(
   text : String,
   config? : ScanConfig = ScanConfig::standard(),
@@ -200,7 +260,7 @@ pub fn redact_json(
   match outcome {
     Some(doc) => {
       let findings : Array[JsonFinding] = []
-      let (rebuilt, changed) = walk_json(doc, "", config, style, findings)
+      let (rebuilt, changed) = walk_json(doc, "", config, style, findings, [])
       let buf = StringBuilder()
       write_json_value(rebuilt, buf)
       {
