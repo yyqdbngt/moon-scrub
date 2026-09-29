@@ -1232,6 +1232,35 @@ pub fn scan_except(
 }
 
 ///|
+
+///|
+/// Human-readable, value-free finding report: one line per finding in the
+/// form `KIND start-end CONFIDENCE`. Safe to print because it never
+/// contains matched text.
+pub fn explain(
+  text : String,
+  config? : ScanConfig = ScanConfig::standard(),
+) -> Array[String] {
+  let lines : Array[String] = []
+  for finding in scan_with_config(text, config) {
+    let confidence = match finding.confidence {
+      High => "HIGH"
+      Medium => "MEDIUM"
+    }
+    lines.push(
+      finding.kind.to_string() +
+      " " +
+      finding.start.to_string() +
+      "-" +
+      finding.end.to_string() +
+      " " +
+      confidence,
+    )
+  }
+  lines
+}
+
+///|
 pub fn scan_full(
   text : String,
   rules : Array[CustomRule],
