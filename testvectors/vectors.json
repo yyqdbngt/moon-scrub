@@ -636,6 +636,30 @@
       "mode": "secrets",
       "input": "{\"password\": \"[REDACTED:CREDENTIAL]\", \"ok\": 1}",
       "expect": []
+    },
+    {
+      "name": "ipv4-with-port",
+      "mode": "standard",
+      "input": "dial 10.0.0.8:5432 ok",
+      "expect": [
+        {
+          "kind": "IPV4",
+          "literal": "10.0.0.8",
+          "confidence": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "name": "ipv4-cidr-suffix",
+      "mode": "standard",
+      "input": "route 10.0.0.0/8 added",
+      "expect": [
+        {
+          "kind": "IPV4",
+          "literal": "10.0.0.0",
+          "confidence": "MEDIUM"
+        }
+      ]
     }
   ]
 }

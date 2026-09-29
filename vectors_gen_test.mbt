@@ -913,3 +913,27 @@ test "vector: json-quoted-key-redacted-marker-stable" {
   )
   assert_eq(findings.length(), 0)
 }
+
+///|
+test "vector: ipv4-with-port" {
+  let input = "dial 10.0.0.8:5432 ok"
+  let findings = @moon_scrub.scan(input)
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "IPV4")
+  assert_eq(findings[0].start, 5)
+  assert_eq(findings[0].end, 13)
+  assert_eq(findings[0].confidence, @moon_scrub.Medium)
+  assert_eq(input[findings[0].start:findings[0].end].to_owned(), "10.0.0.8")
+}
+
+///|
+test "vector: ipv4-cidr-suffix" {
+  let input = "route 10.0.0.0/8 added"
+  let findings = @moon_scrub.scan(input)
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "IPV4")
+  assert_eq(findings[0].start, 6)
+  assert_eq(findings[0].end, 14)
+  assert_eq(findings[0].confidence, @moon_scrub.Medium)
+  assert_eq(input[findings[0].start:findings[0].end].to_owned(), "10.0.0.0")
+}
