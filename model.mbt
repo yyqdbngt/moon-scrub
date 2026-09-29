@@ -220,6 +220,20 @@ pub extend StructuredResult with Eq::{equal, not_equal}
 pub extend StructuredResult with @debug.Debug::{to_repr}
 
 ///|
+/// One kind-to-count pair; summaries are ordered by kind name so identical
+/// inputs always produce identical reports.
+pub(all) struct KindCount {
+  kind : SensitiveKind
+  mut count : Int
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend KindCount with Eq::{equal, not_equal}
+
+///|
+pub extend KindCount with @debug.Debug::{to_repr}
+
+///|
 pub(all) struct BatchResult {
   lines : Array[String]
   summary : BatchSummary

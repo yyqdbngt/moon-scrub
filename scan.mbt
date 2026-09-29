@@ -1150,6 +1150,46 @@ pub fn scan_with_rules(
 
 ///|
 /// Unified entry point combining exact-value rules with a full configuration.
+
+///|
+/// Count findings by kind without producing redacted text. Ordered by kind
+/// name for deterministic output; counts only, never values.
+pub fn findings_summary(
+  text : String,
+  config? : ScanConfig = ScanConfig::standard(),
+) -> Array[KindCount] {
+  let findings = scan_with_config(text, config)
+  let rows : Array[KindCount] = []
+  for finding in findings {
+    let mut placed = false
+    for row in rows {
+      if row.kind == finding.kind {
+        row.count += 1
+        placed = true
+        break
+      }
+    }
+    if !placed {
+      rows.push({ kind: finding.kind, count: 1, })
+    }
+  }
+  for i = 1; i < rows.length(); i = i + 1 {
+    let value = rows[i]
+    let mut j = i
+    while j > 0 &&
+          lexicographic_before(
+            value.kind.to_string(),
+            rows[j - 1].kind.to_string(),
+          ) {
+      rows[j] = rows[j - 1]
+      j -= 1
+    }
+    rows[j] = value
+  }
+  rows
+}
+
+///|
 pub fn scan_full(
   text : String,
   rules : Array[CustomRule],
