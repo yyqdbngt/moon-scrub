@@ -122,8 +122,7 @@ fn scan_prefixed_tokens(
 }
 
 ///|
-fn scan_bearer(text : String, out : Array[Finding]) -> Unit {
-  let lower = ascii_lower(text)
+fn scan_bearer(text : String, lower : String, out : Array[Finding]) -> Unit {
   for i = 0; i + 7 < text.length(); i = i + 1 {
     if starts_at(lower, i, "bearer ") {
       let start = i + 7
@@ -262,8 +261,11 @@ fn sensitive_key(key : String) -> Bool {
 }
 
 ///|
-fn scan_assignments(text : String, out : Array[Finding]) -> Unit {
-  let lower = ascii_lower(text)
+fn scan_assignments(
+  text : String,
+  lower : String,
+  out : Array[Finding],
+) -> Unit {
   let mut i = 0
   while i < text.length() {
     if is_ascii_letter(text[i].to_int()) || text[i].to_int() == 95 {
@@ -987,8 +989,11 @@ fn scan_wallet_addresses(text : String, out : Array[Finding]) -> Unit {
 /// Incoming-webhook URLs: Slack `hooks.slack.com/services/T.../B.../token`
 /// and Discord `discord.com/api/webhooks/<id>/<token>`. The path structure
 /// and segment shapes are validated, not just the host name.
-fn scan_webhook_urls(text : String, out : Array[Finding]) -> Unit {
-  let lower = ascii_lower(text)
+fn scan_webhook_urls(
+  text : String,
+  lower : String,
+  out : Array[Finding],
+) -> Unit {
   let anchors = ["hooks.slack.com/services/", "discord.com/api/webhooks/"]
   for i = 0; i < text.length(); i = i + 1 {
     for anchor in anchors {
@@ -1059,11 +1064,15 @@ fn run_detectors(
   config : ScanConfig,
   out : Array[Finding],
 ) -> Unit {
+  let needs_lower = config.detect_bearer ||
+    config.detect_assignment ||
+    config.detect_webhook
+  let lower = if needs_lower { ascii_lower(text) } else { "" }
   if config.detect_access_token {
     scan_prefixed_tokens(text, config.extra_prefixes, out)
   }
   if config.detect_bearer {
-    scan_bearer(text, out)
+    scan_bearer(text, lower, out)
   }
   if config.detect_jwt {
     scan_jwt(text, out)
@@ -1075,7 +1084,7 @@ fn run_detectors(
     scan_url_credentials(text, out)
   }
   if config.detect_assignment {
-    scan_assignments(text, out)
+    scan_assignments(text, lower, out)
   }
   if config.detect_email {
     scan_emails(text, out)
@@ -1096,10 +1105,10 @@ fn run_detectors(
     scan_wallet_addresses(text, out)
   }
   if config.detect_webhook {
-    scan_webhook_urls(text, out)
+    scan_webhook_urls(text, lower, out)
   }
   if config.detect_assignment {
-    scan_basic_auth(text, ascii_lower(text), out)
+    scan_basic_auth(text, lower, out)
   }
   // Resident IDs outrank payment cards: an eighteen-digit checksummed
   // identity number is stronger evidence than a Luhn pass, and Mastercard
