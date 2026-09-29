@@ -35,7 +35,7 @@
 MoonCakes 已发布并通过独立消费项目验证：
 
 ```sh
-moon add yyqdbngt/moon_scrub
+moon add 123123213weqw/moon_scrub
 ```
 
 ```moonbit nocheck
@@ -70,7 +70,7 @@ fn main {
 
 ```text
 import {
-  "yyqdbngt/moon_scrub" @scrub,
+  "123123213weqw/moon_scrub" @scrub,
 }
 ```
 
