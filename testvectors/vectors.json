@@ -540,6 +540,36 @@
           "confidence": "HIGH"
         }
       ]
+    },
+    {
+      "name": "wallet-ethereum",
+      "mode": "config",
+      "input": "pay 0x71C7656EC7ab88b098defB751B7401B5f6d8976F now",
+      "expect": [
+        {
+          "kind": "WALLET_ADDRESS",
+          "literal": "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+          "confidence": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "name": "wallet-bech32",
+      "mode": "config",
+      "input": "to bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4 ok",
+      "expect": [
+        {
+          "kind": "WALLET_ADDRESS",
+          "literal": "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+          "confidence": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "name": "wallet-short-hex-rejected",
+      "mode": "config",
+      "input": "hex 0xdeadbeef nope",
+      "expect": []
     }
   ]
 }

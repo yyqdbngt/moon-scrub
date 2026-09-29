@@ -774,3 +774,49 @@ test "vector: pem-certificate-block" {
     "-----BEGIN CERTIFICATE-----\nMIIBszCCAVmgAwIBAgIUX+abc123fake456def789ghi012\n-----END CERTIFICATE-----",
   )
 }
+
+///|
+test "vector: wallet-ethereum" {
+  let input = "pay 0x71C7656EC7ab88b098defB751B7401B5f6d8976F now"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "WALLET_ADDRESS")
+  assert_eq(findings[0].start, 4)
+  assert_eq(findings[0].end, 46)
+  assert_eq(findings[0].confidence, @moon_scrub.Medium)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+  )
+}
+
+///|
+test "vector: wallet-bech32" {
+  let input = "to bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4 ok"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "WALLET_ADDRESS")
+  assert_eq(findings[0].start, 3)
+  assert_eq(findings[0].end, 45)
+  assert_eq(findings[0].confidence, @moon_scrub.Medium)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+  )
+}
+
+///|
+test "vector: wallet-short-hex-rejected" {
+  let input = "hex 0xdeadbeef nope"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 0)
+}

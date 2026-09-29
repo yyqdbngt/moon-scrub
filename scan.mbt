@@ -912,6 +912,62 @@ fn scan_certificates(text : String, out : Array[Finding]) -> Unit {
 }
 
 ///|
+/// Cryptocurrency wallet addresses as pure shape matches: `0x` plus forty
+/// hex characters for Ethereum-style, and bech32 `bc1`/`tb1`/`ltc1` bodies
+/// for SegWit-style. No checksum validation, hence medium confidence.
+fn scan_wallet_addresses(text : String, out : Array[Finding]) -> Unit {
+  let mut i = 0
+  while i < text.length() {
+    let c = text[i].to_int()
+    if c == 48 &&
+      i + 1 < text.length() &&
+      (text[i + 1].to_int() == 120 || text[i + 1].to_int() == 88) {
+      let start = i
+      let mut end = i + 2
+      while end < text.length() && is_ascii_hexdigit(text[end].to_int()) {
+        end += 1
+      }
+      if end - start == 42 {
+        push_finding(out, WalletAddress, start, end, Medium)
+        i = end
+      } else {
+        i += 1
+      }
+    } else if (c == 98 || c == 66) && i + 3 < text.length() {
+      let probe = ascii_lower(text[i:i + 4].to_owned())
+      if probe == "bc1q" ||
+        probe == "bc1p" ||
+        probe == "tb1q" ||
+        probe == "tb1p" ||
+        probe == "ltc1" {
+        // Collect the full lowercase-alnum body (HRP plus separator plus
+        // data); the prefix probe above already pins the family.
+        let start = i
+        let mut end = i
+        while end < text.length() {
+          let r = text[end].to_int()
+          if is_ascii_digit(r) || (r >= 97 && r <= 122) {
+            end += 1
+          } else {
+            break
+          }
+        }
+        if end - start >= 14 && end - start <= 90 {
+          push_finding(out, WalletAddress, start, end, Medium)
+          i = end
+        } else {
+          i += 1
+        }
+      } else {
+        i += 1
+      }
+    } else {
+      i += 1
+    }
+  }
+}
+
+///|
 fn run_detectors(
   text : String,
   config : ScanConfig,
@@ -949,6 +1005,9 @@ fn run_detectors(
   }
   if config.detect_public_key {
     scan_public_keys(text, out)
+  }
+  if config.detect_wallet {
+    scan_wallet_addresses(text, out)
   }
   // Resident IDs outrank payment cards: an eighteen-digit checksummed
   // identity number is stronger evidence than a Luhn pass, and Mastercard
