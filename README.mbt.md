@@ -52,8 +52,11 @@ Configuration:
 
 Detectors cover structured access tokens across GitHub, GitLab, Slack, AWS,
 Google, Stripe, Anthropic, OpenAI-style, SendGrid, Doppler and npm prefixes,
-plus bearer credentials, JWTs, sensitive assignments, email addresses, IPv4
-addresses, private-key blocks, URL credentials, and Luhn-valid payment cards
-with major-network BIN prefixes. This is a deterministic helper, not a
+bearer and Basic credentials, JWTs, sensitive assignments (including
+JSON-style quoted keys), webhook URLs, email addresses, IPv4 and IPv6,
+Luhn-valid payment cards with major-network BIN prefixes (Amex spacing
+included), Chinese resident identity numbers with checksum validation, MAC
+addresses, UUIDs, SSH public keys and certificate blocks, wallet addresses,
+and opt-in E.164 phone numbers. This is a deterministic helper, not a
 complete DLP or compliance system. See the repository README and security
 model for limitations.
