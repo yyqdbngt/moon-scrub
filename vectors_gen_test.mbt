@@ -619,3 +619,74 @@ test "vector: uuid-truncated-rejected" {
   )
   assert_eq(findings.length(), 0)
 }
+
+///|
+test "vector: ipv6-full" {
+  let input = "addr 2001:0db8:85a3:0000:0000:8a2e:0370:7334 up"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "IPV6")
+  assert_eq(findings[0].start, 5)
+  assert_eq(findings[0].end, 44)
+  assert_eq(findings[0].confidence, @moon_scrub.Medium)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+  )
+}
+
+///|
+test "vector: ipv6-compressed" {
+  let input = "link fe80::1ff:fe23:4567:890a ok"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "IPV6")
+  assert_eq(findings[0].start, 5)
+  assert_eq(findings[0].end, 29)
+  assert_eq(findings[0].confidence, @moon_scrub.Medium)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "fe80::1ff:fe23:4567:890a",
+  )
+}
+
+///|
+test "vector: ipv6-loopback" {
+  let input = "host ::1"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "IPV6")
+  assert_eq(findings[0].start, 5)
+  assert_eq(findings[0].end, 8)
+  assert_eq(findings[0].confidence, @moon_scrub.Medium)
+  assert_eq(input[findings[0].start:findings[0].end].to_owned(), "::1")
+}
+
+///|
+test "vector: ipv6-seven-groups-rejected" {
+  let input = "no 1:2:3:4:5:6:7"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 0)
+}
+
+///|
+test "vector: ipv6-double-compression-rejected" {
+  let input = "no 1::2::3"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 0)
+}

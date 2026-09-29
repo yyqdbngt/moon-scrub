@@ -729,6 +729,96 @@ fn scan_uuids(text : String, out : Array[Finding]) -> Unit {
 }
 
 ///|
+/// Validate a hex-and-colon run as an RFC 4291 address: groups of one to
+/// four hex digits, at most one `::` compression, and either eight full
+/// groups or fewer when compressed. IPv4-mapped tails are not accepted.
+fn ipv6_run_ok(run : String) -> Bool {
+  if run.length() < 2 || run.length() > 45 {
+    return false
+  }
+  let mut groups = 0
+  let mut compressed = false
+  let mut part_start = 0
+  let mut i = 0
+  let mut expect_group = false
+  while i <= run.length() {
+    if i == run.length() || run[i].to_int() == 58 {
+      if i > part_start {
+        if i - part_start > 4 || !all_hex(run, part_start, i) {
+          return false
+        }
+        groups += 1
+      } else if i == 0 || i == run.length() {
+        // leading or trailing single colon adjacent to compression
+      } else if run[i - 1].to_int() == 58 {
+        // second colon of a compression marker
+      } else {
+        return false
+      }
+      if i < run.length() && run[i].to_int() == 58 {
+        if i + 1 < run.length() && run[i + 1].to_int() == 58 {
+          if compressed {
+            return false
+          }
+          compressed = true
+          expect_group = false
+          i += 2
+          part_start = i
+          continue
+        }
+      }
+      part_start = i + 1
+      expect_group = true
+    }
+    i += 1
+  }
+  ignore(expect_group)
+  if compressed {
+    groups < 8
+  } else {
+    groups == 8
+  }
+}
+
+///|
+fn all_hex(text : String, start : Int, end : Int) -> Bool {
+  for k = start; k < end; k = k + 1 {
+    if !is_ascii_hexdigit(text[k].to_int()) {
+      return false
+    }
+  }
+  true
+}
+
+///|
+/// Scan for IPv6 literals inside hex-and-colon runs bounded by non-hex,
+/// non-colon characters. The run is re-parsed strictly, so MAC-shaped and
+/// time-shaped colon runs never qualify.
+fn scan_ipv6(text : String, out : Array[Finding]) -> Unit {
+  let mut i = 0
+  while i < text.length() {
+    let c = text[i].to_int()
+    if is_ascii_hexdigit(c) || c == 58 {
+      let start = i
+      while i < text.length() {
+        let r = text[i].to_int()
+        if is_ascii_hexdigit(r) || r == 58 {
+          i += 1
+        } else {
+          break
+        }
+      }
+      let run = text[start:i].to_owned()
+      if ipv6_run_ok(run) {
+        push_finding(out, Ipv6, start, i, Medium)
+      }
+    } else {
+      i += 1
+    }
+  }
+}
+
+///|
 fn run_detectors(
   text : String,
   config : ScanConfig,
@@ -757,6 +847,9 @@ fn run_detectors(
   }
   if config.detect_ipv4 {
     scan_ipv4(text, config.suppress_version_ipv4, out)
+  }
+  if config.detect_ipv6 {
+    scan_ipv6(text, out)
   }
   // Resident IDs outrank payment cards: an eighteen-digit checksummed
   // identity number is stronger evidence than a Luhn pass, and Mastercard

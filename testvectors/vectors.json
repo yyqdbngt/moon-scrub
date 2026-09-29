@@ -438,6 +438,54 @@
       "mode": "config",
       "input": "short 550e8400-e29b-41d4-a716 nope",
       "expect": []
+    },
+    {
+      "name": "ipv6-full",
+      "mode": "config",
+      "input": "addr 2001:0db8:85a3:0000:0000:8a2e:0370:7334 up",
+      "expect": [
+        {
+          "kind": "IPV6",
+          "literal": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+          "confidence": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "name": "ipv6-compressed",
+      "mode": "config",
+      "input": "link fe80::1ff:fe23:4567:890a ok",
+      "expect": [
+        {
+          "kind": "IPV6",
+          "literal": "fe80::1ff:fe23:4567:890a",
+          "confidence": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "name": "ipv6-loopback",
+      "mode": "config",
+      "input": "host ::1",
+      "expect": [
+        {
+          "kind": "IPV6",
+          "literal": "::1",
+          "confidence": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "name": "ipv6-seven-groups-rejected",
+      "mode": "config",
+      "input": "no 1:2:3:4:5:6:7",
+      "expect": []
+    },
+    {
+      "name": "ipv6-double-compression-rejected",
+      "mode": "config",
+      "input": "no 1::2::3",
+      "expect": []
     }
   ]
 }
