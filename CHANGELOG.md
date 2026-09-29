@@ -1,5 +1,78 @@
 # Changelog
 
+## 0.3.0 — 2026-09-29
+
+Fifty-commit push: thirteen new detector families, a reporting and
+exception API layer, performance work, and the infrastructure that turns
+the vector file into a proven cross-language contract. Verified on
+wasm, wasm-gc, js and native under moonc 0.10.14.
+
+Detectors:
+
+- Chinese resident identity numbers with GB 11643 checksum and
+  calendar-valid birth date (checksum-passing fabrications rejected);
+  ordered before card scanning so Mastercard-overlapping area codes
+  resolve to the identity finding.
+- EUI-48 MAC addresses (colon or hyphen, consistent separator), canonical
+  UUIDs, IPv6 literals with strict RFC 4291 run re-validation, opt-in
+  E.164 phone numbers, SSH public key lines, PEM certificate and CSR
+  blocks, Ethereum and bech32 wallet shapes, Slack and Discord incoming
+  webhook URLs with structural path validation, HTTP Basic
+  authorization blobs, and ENCRYPTED/PGP/DSA private key headers.
+- Sensitive key list extended to Azure/AWS connection-string spellings
+  (including camel-case SharedAccessKey), passphrase, credential,
+  refresh_token, session_key and more; JSON-style quoted keys
+  ("password": value) now match, with quoted markers skipped for
+  idempotence.
+
+Configuration and API:
+
+- ScanConfig::pii_only preset; redact_batch_with_config,
+  redact_fields_with_config, verify_clean_with_rules,
+  redact_json_with_rules.
+- findings_summary (deterministic kind-ordered counts without redacted
+  text), explain (value-free per-finding report lines), scan_except and
+  redact_except for caller-certified safe literals,
+  ChunkScanner::push_lines, BatchResult.changed_indices,
+  JsonRedactionResult::paths, Confidence::to_string.
+- Opt-in suppress_example_domains drops documentation-domain emails.
+
+Performance:
+
+- Allocation-free prefix comparison (batch throughput roughly doubled),
+  one shared lowercase pass for the four case-insensitive detectors,
+  StringBuilder rebuild for redaction output and the streaming buffer,
+  in-place email domain shape checks, and scan.mbt split into per-family
+  modules.
+
+Streaming correctness (found by the new property tests):
+
+- StringBuilder::to_string hands off its backing array when full; the
+  streaming buffer now re-seeds after every materialization.
+- Sliding the window to an unsettled finding's start cuts the trigger
+  context (the password= key, Bearer word, URL scheme) so assignments
+  could never settle; the window retains a 32-code-unit context margin
+  and emitted findings are deduplicated when the retreat re-shows them.
+- Both defects were invisible to the fixed-sample tests because their
+  corpus never exceeded the overlap window.
+
+Infrastructure:
+
+- Python reference scanner implementing the full vector contract; CI
+  runs it as a differential gate on every push (all vectors match).
+- pkg.generated.mbti API snapshot checked in and gated in CI; vector
+  generator emits moon-fmt-stable output; json-pipeline and
+  stream-pipeline examples run on every backend; bench gained a JSON
+  throughput mode; performance methodology and cross-language porting
+  guides added.
+
+Fixes:
+
+- Amex 4-6-5 spaced grouping (3782 822463 10005) now redacts like the
+  unspaced form; leading-zero IPv4 octets are rejected as version noise;
+  PEM footers stop at the closing dash run instead of swallowing
+  same-line prose; redact_batch_with_config now counts changed_lines.
+
 ## 0.2.0 — 2026-09-29
 
 Everything from the 0.1.0 proposal's follow-up plan, plus fixes found on the
