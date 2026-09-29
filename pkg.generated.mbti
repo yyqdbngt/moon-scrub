@@ -1,0 +1,271 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "yyqdbngt/moon_scrub"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn explain(String, config? : ScanConfig) -> Array[String]
+
+pub fn findings_summary(String, config? : ScanConfig) -> Array[KindCount]
+
+pub fn redact(String, style? : RedactionStyle, policy? : ScanPolicy) -> RedactionResult
+
+pub fn redact_batch(Array[String], style? : RedactionStyle, policy? : ScanPolicy) -> BatchResult
+
+pub fn redact_batch_with_config(Array[String], ScanConfig, style? : RedactionStyle) -> BatchResult
+
+pub fn redact_except(String, Array[String], style? : RedactionStyle, config? : ScanConfig) -> RedactionResult
+
+pub fn redact_fields(Array[StructuredField], style? : RedactionStyle, policy? : ScanPolicy) -> StructuredResult
+
+pub fn redact_fields_with_config(Array[StructuredField], ScanConfig, style? : RedactionStyle) -> StructuredResult
+
+pub fn redact_full(String, Array[CustomRule], ScanConfig, style? : RedactionStyle) -> RedactionResult
+
+pub fn redact_json(String, config? : ScanConfig, style? : RedactionStyle) -> JsonRedactionResult
+
+pub fn redact_json_with_rules(String, Array[CustomRule], config? : ScanConfig, style? : RedactionStyle) -> JsonRedactionResult
+
+pub fn redact_with_config(String, ScanConfig, style? : RedactionStyle) -> RedactionResult
+
+pub fn redact_with_rules(String, Array[CustomRule], style? : RedactionStyle, policy? : ScanPolicy) -> RedactionResult
+
+pub fn scan(String, policy? : ScanPolicy) -> Array[Finding]
+
+pub fn scan_except(String, Array[String], config? : ScanConfig) -> Array[Finding]
+
+pub fn scan_full(String, Array[CustomRule], ScanConfig) -> Array[Finding]
+
+pub fn scan_with_config(String, ScanConfig) -> Array[Finding]
+
+pub fn scan_with_rules(String, Array[CustomRule], policy? : ScanPolicy) -> Array[Finding]
+
+pub fn verify_clean(String, policy? : ScanPolicy) -> Bool
+
+pub fn verify_clean_with_config(String, ScanConfig) -> Bool
+
+pub fn verify_clean_with_rules(String, Array[CustomRule], config? : ScanConfig) -> Bool
+
+// Errors
+
+// Types and methods
+pub(all) struct BatchResult {
+  lines : Array[String]
+  summary : BatchSummary
+  changed_indices : Array[Int]
+} derive(Eq, @debug.Debug)
+pub fn BatchResult::equal(Self, Self) -> Bool
+pub fn BatchResult::not_equal(Self, Self) -> Bool
+pub fn BatchResult::to_repr(Self) -> @debug.Repr
+
+pub(all) struct BatchSummary {
+  lines : Int
+  mut changed_lines : Int
+  mut findings : Int
+  mut access_tokens : Int
+  mut bearer_tokens : Int
+  mut jwts : Int
+  mut credentials : Int
+  mut emails : Int
+  mut ipv4s : Int
+  mut payment_cards : Int
+  mut private_keys : Int
+  mut url_credentials : Int
+  mut custom_secrets : Int
+  mut resident_ids : Int
+  mut mac_addresses : Int
+  mut uuids : Int
+  mut ipv6s : Int
+  mut phones : Int
+  mut public_keys : Int
+  mut wallet_addresses : Int
+  mut webhook_urls : Int
+} derive(Eq, @debug.Debug)
+pub fn BatchSummary::equal(Self, Self) -> Bool
+pub fn BatchSummary::not_equal(Self, Self) -> Bool
+pub fn BatchSummary::to_repr(Self) -> @debug.Repr
+
+type ChunkScanner
+pub fn ChunkScanner::finish(Self) -> Array[Finding]
+pub fn ChunkScanner::new(config? : ScanConfig, overlap? : Int) -> Self
+pub fn ChunkScanner::push(Self, String) -> Array[Finding]
+pub fn ChunkScanner::push_lines(Self, Array[String]) -> Array[Finding]
+
+pub(all) enum Confidence {
+  High
+  Medium
+} derive(Eq, @debug.Debug)
+pub fn Confidence::equal(Self, Self) -> Bool
+pub fn Confidence::not_equal(Self, Self) -> Bool
+pub fn Confidence::to_repr(Self) -> @debug.Repr
+pub fn Confidence::to_string(Self) -> String
+
+pub(all) struct CustomRule {
+  label : String
+  value : String
+} derive(Eq, @debug.Debug)
+pub fn CustomRule::equal(Self, Self) -> Bool
+pub fn CustomRule::not_equal(Self, Self) -> Bool
+pub fn CustomRule::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Finding {
+  kind : SensitiveKind
+  start : Int
+  end : Int
+  confidence : Confidence
+} derive(Eq, @debug.Debug)
+pub fn Finding::equal(Self, Self) -> Bool
+pub fn Finding::not_equal(Self, Self) -> Bool
+pub fn Finding::to_repr(Self) -> @debug.Repr
+
+pub(all) struct JsonFinding {
+  path : String
+  finding : Finding
+} derive(Eq, @debug.Debug)
+pub fn JsonFinding::equal(Self, Self) -> Bool
+pub fn JsonFinding::not_equal(Self, Self) -> Bool
+pub fn JsonFinding::to_repr(Self) -> @debug.Repr
+
+pub(all) struct JsonRedactionResult {
+  text : String
+  changed_fields : Int
+  findings : Array[JsonFinding]
+  parsed : Bool
+} derive(Eq, @debug.Debug)
+pub fn JsonRedactionResult::equal(Self, Self) -> Bool
+pub fn JsonRedactionResult::not_equal(Self, Self) -> Bool
+pub fn JsonRedactionResult::paths(Self) -> Array[String]
+pub fn JsonRedactionResult::to_repr(Self) -> @debug.Repr
+
+pub(all) struct KindCount {
+  kind : SensitiveKind
+  mut count : Int
+} derive(Eq, @debug.Debug)
+pub fn KindCount::equal(Self, Self) -> Bool
+pub fn KindCount::not_equal(Self, Self) -> Bool
+pub fn KindCount::to_repr(Self) -> @debug.Repr
+
+pub(all) struct RedactionResult {
+  text : String
+  findings : Array[Finding]
+  changed : Bool
+} derive(Eq, @debug.Debug)
+pub fn RedactionResult::equal(Self, Self) -> Bool
+pub fn RedactionResult::not_equal(Self, Self) -> Bool
+pub fn RedactionResult::to_repr(Self) -> @debug.Repr
+
+pub(all) enum RedactionStyle {
+  Marker
+  Typed
+  PreserveLast4
+} derive(Eq, @debug.Debug)
+pub fn RedactionStyle::equal(Self, Self) -> Bool
+pub fn RedactionStyle::not_equal(Self, Self) -> Bool
+pub fn RedactionStyle::to_repr(Self) -> @debug.Repr
+
+pub(all) struct ScanConfig {
+  detect_access_token : Bool
+  detect_bearer : Bool
+  detect_jwt : Bool
+  detect_private_key : Bool
+  detect_url_credential : Bool
+  detect_assignment : Bool
+  detect_email : Bool
+  detect_ipv4 : Bool
+  detect_payment_card : Bool
+  detect_resident_id : Bool
+  detect_webhook : Bool
+  detect_wallet : Bool
+  detect_public_key : Bool
+  detect_phone : Bool
+  detect_ipv6 : Bool
+  detect_uuid : Bool
+  detect_mac : Bool
+  suppress_version_ipv4 : Bool
+  require_known_card_prefix : Bool
+  extra_prefixes : Array[TokenPrefixRule]
+} derive(Eq, @debug.Debug)
+pub fn ScanConfig::equal(Self, Self) -> Bool
+pub fn ScanConfig::not_equal(Self, Self) -> Bool
+pub fn ScanConfig::pii_only() -> Self
+pub fn ScanConfig::secrets_only() -> Self
+pub fn ScanConfig::standard() -> Self
+pub fn ScanConfig::to_repr(Self) -> @debug.Repr
+
+pub(all) struct ScanPolicy {
+  detect_email : Bool
+  detect_ipv4 : Bool
+  detect_payment_card : Bool
+} derive(Eq, @debug.Debug)
+pub fn ScanPolicy::equal(Self, Self) -> Bool
+pub fn ScanPolicy::not_equal(Self, Self) -> Bool
+pub fn ScanPolicy::secrets_only() -> Self
+pub fn ScanPolicy::standard() -> Self
+pub fn ScanPolicy::to_repr(Self) -> @debug.Repr
+
+pub(all) enum SensitiveKind {
+  AccessToken
+  BearerToken
+  Jwt
+  CredentialAssignment
+  Email
+  Ipv4
+  PaymentCard
+  PrivateKey
+  UrlCredential
+  CustomSecret
+  ResidentId
+  MacAddress
+  Uuid
+  Ipv6
+  Phone
+  PublicKey
+  WalletAddress
+  WebhookUrl
+} derive(Eq, @debug.Debug)
+pub fn SensitiveKind::equal(Self, Self) -> Bool
+pub fn SensitiveKind::not_equal(Self, Self) -> Bool
+pub fn SensitiveKind::to_repr(Self) -> @debug.Repr
+pub fn SensitiveKind::to_string(Self) -> String
+
+pub(all) struct StructuredField {
+  path : String
+  value : String
+} derive(Eq, @debug.Debug)
+pub fn StructuredField::equal(Self, Self) -> Bool
+pub fn StructuredField::not_equal(Self, Self) -> Bool
+pub fn StructuredField::to_repr(Self) -> @debug.Repr
+
+pub(all) struct StructuredFieldResult {
+  path : String
+  value : String
+  findings : Array[Finding]
+  changed : Bool
+  sensitive_path : Bool
+} derive(Eq, @debug.Debug)
+pub fn StructuredFieldResult::equal(Self, Self) -> Bool
+pub fn StructuredFieldResult::not_equal(Self, Self) -> Bool
+pub fn StructuredFieldResult::to_repr(Self) -> @debug.Repr
+
+pub(all) struct StructuredResult {
+  fields : Array[StructuredFieldResult]
+  changed_fields : Int
+  findings : Int
+} derive(Eq, @debug.Debug)
+pub fn StructuredResult::equal(Self, Self) -> Bool
+pub fn StructuredResult::not_equal(Self, Self) -> Bool
+pub fn StructuredResult::to_repr(Self) -> @debug.Repr
+
+pub(all) struct TokenPrefixRule {
+  prefix : String
+  min_length : Int
+} derive(Eq, @debug.Debug)
+pub fn TokenPrefixRule::equal(Self, Self) -> Bool
+pub fn TokenPrefixRule::not_equal(Self, Self) -> Bool
+pub fn TokenPrefixRule::to_repr(Self) -> @debug.Repr
+
+// Type aliases
+
+// Traits
