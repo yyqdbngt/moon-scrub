@@ -155,6 +155,8 @@ def scan_assignments(text, out):
         if key.lower() not in SENSITIVE_KEYS:
             continue
         sep = m.end()
+        if sep < len(text) and text[sep] in "\"'":
+            sep += 1
         while sep < len(text) and text[sep] in " \t":
             sep += 1
         if sep >= len(text) or text[sep] not in "=:":
@@ -171,9 +173,10 @@ def scan_assignments(text, out):
             continue
         if start < len(text) and text[start] in "\"'":
             quote = text[start]
-            end = text.find(quote, start + 1)
-            end = len(text) if end < 0 else end
-            push(out, "CREDENTIAL", start + 1, end, "HIGH")
+            if not text.startswith("[REDACTED", start + 1):
+                end = text.find(quote, start + 1)
+                end = len(text) if end < 0 else end
+                push(out, "CREDENTIAL", start + 1, end, "HIGH")
         else:
             end = start
             while end < len(text) and text[end] not in " \t\n\r,;\"'}]":

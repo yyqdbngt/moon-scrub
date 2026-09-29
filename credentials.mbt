@@ -208,6 +208,12 @@ fn scan_assignments(
       }
       let key = text[key_start:i].to_owned()
       let mut sep = i
+      // A closing quote right after the key is JSON/object spelling
+      // ("password": value); step over it before looking for the separator.
+      if sep < text.length() &&
+        (text[sep].to_int() == 34 || text[sep].to_int() == 39) {
+        sep += 1
+      }
       while sep < text.length() &&
             (text[sep].to_int() == 32 || text[sep].to_int() == 9) {
         sep += 1
@@ -233,11 +239,15 @@ fn scan_assignments(
           (text[start].to_int() == 34 || text[start].to_int() == 39) {
           let quote = text[start].to_int()
           start += 1
-          let mut end = start
-          while end < text.length() && text[end].to_int() != quote {
-            end += 1
+          // A quoted marker is an already-redacted value; skip it so
+          // re-scanning redacted JSON stays idempotent.
+          if !starts_at(text, start, "[REDACTED") {
+            let mut end = start
+            while end < text.length() && text[end].to_int() != quote {
+              end += 1
+            }
+            push_finding(out, CredentialAssignment, start, end, High)
           }
-          push_finding(out, CredentialAssignment, start, end, High)
         } else {
           push_finding(
             out,

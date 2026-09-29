@@ -888,3 +888,28 @@ test "vector: ipv4-leading-zero-rejected" {
   let findings = @moon_scrub.scan(input)
   assert_eq(findings.length(), 0)
 }
+
+///|
+test "vector: json-quoted-assignment-key" {
+  let input = "{\"password\": \"hunter2\", \"ok\": 1}"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "CREDENTIAL")
+  assert_eq(findings[0].start, 14)
+  assert_eq(findings[0].end, 21)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(input[findings[0].start:findings[0].end].to_owned(), "hunter2")
+}
+
+///|
+test "vector: json-quoted-key-redacted-marker-stable" {
+  let input = "{\"password\": \"[REDACTED:CREDENTIAL]\", \"ok\": 1}"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 0)
+}

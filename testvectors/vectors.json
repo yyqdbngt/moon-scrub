@@ -618,6 +618,24 @@
       "mode": "standard",
       "input": "no 010.1.1.1 and 192.168.001.7",
       "expect": []
+    },
+    {
+      "name": "json-quoted-assignment-key",
+      "mode": "secrets",
+      "input": "{\"password\": \"hunter2\", \"ok\": 1}",
+      "expect": [
+        {
+          "kind": "CREDENTIAL",
+          "literal": "hunter2",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "json-quoted-key-redacted-marker-stable",
+      "mode": "secrets",
+      "input": "{\"password\": \"[REDACTED:CREDENTIAL]\", \"ok\": 1}",
+      "expect": []
     }
   ]
 }
