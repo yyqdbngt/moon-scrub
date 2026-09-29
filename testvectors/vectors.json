@@ -588,6 +588,18 @@
       "mode": "config",
       "input": "x https://hooks.slack.com/services/T00/B00/short",
       "expect": []
+    },
+    {
+      "name": "basic-auth-header",
+      "mode": "config",
+      "input": "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=",
+      "expect": [
+        {
+          "kind": "CREDENTIAL",
+          "literal": "dXNlcm5hbWU6cGFzc3dvcmQ=",
+          "confidence": "HIGH"
+        }
+      ]
     }
   ]
 }

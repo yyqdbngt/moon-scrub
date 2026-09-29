@@ -281,6 +281,10 @@ fn scan_assignments(text : String, out : Array[Finding]) -> Unit {
         if ascii_lower(key) == "authorization" &&
           starts_at(lower, start, "bearer ") {
           i = start + 7
+        } else if ascii_lower(key) == "authorization" &&
+          starts_at(lower, start, "basic ") {
+          // The Basic-auth detector owns the base64 blob; do not double-report.
+          i = start + 6
         } else if starts_at(text, start, "[REDACTED") {
           i = start + 9
         } else if start < text.length() &&
@@ -1018,6 +1022,26 @@ fn scan_webhook_urls(text : String, out : Array[Finding]) -> Unit {
 }
 
 ///|
+/// HTTP Basic credentials in `Authorization: Basic <base64>` headers. The
+/// base64 blob decodes to user:password, so the whole value is secret even
+/// though no single word looks like one.
+fn scan_basic_auth(text : String, lower : String, out : Array[Finding]) -> Unit {
+  for i = 0; i + 20 < text.length(); i = i + 1 {
+    if starts_at(lower, i, "authorization: basic ") ||
+      starts_at(lower, i, "authorization basic ") {
+      let start = i + 21
+      let mut end = start
+      while end < text.length() && is_base64url(text[end].to_int()) {
+        end += 1
+      }
+      if end - start >= 16 && !starts_at(text, start, "[REDACTED") {
+        push_finding(out, CredentialAssignment, start, end, High)
+      }
+    }
+  }
+}
+
+///|
 fn run_detectors(
   text : String,
   config : ScanConfig,
@@ -1061,6 +1085,9 @@ fn run_detectors(
   }
   if config.detect_webhook {
     scan_webhook_urls(text, out)
+  }
+  if config.detect_assignment {
+    scan_basic_auth(text, ascii_lower(text), out)
   }
   // Resident IDs outrank payment cards: an eighteen-digit checksummed
   // identity number is stronger evidence than a Luhn pass, and Mastercard

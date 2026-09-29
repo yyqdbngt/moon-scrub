@@ -848,3 +848,21 @@ test "vector: webhook-malformed-rejected" {
   )
   assert_eq(findings.length(), 0)
 }
+
+///|
+test "vector: basic-auth-header" {
+  let input = "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ="
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "CREDENTIAL")
+  assert_eq(findings[0].start, 21)
+  assert_eq(findings[0].end, 45)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "dXNlcm5hbWU6cGFzc3dvcmQ=",
+  )
+}
