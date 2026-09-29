@@ -24,14 +24,15 @@ fn redact_with_findings(
   if findings.length() == 0 {
     return text
   }
-  let mut out = ""
+  let out = StringBuilder()
   let mut cursor = 0
   for finding in findings {
-    out += text[cursor:finding.start].to_owned()
-    out += replacement(text, finding, style)
+    out.write_string(text[cursor:finding.start].to_owned())
+    out.write_string(replacement(text, finding, style))
     cursor = finding.end
   }
-  out + text[cursor:].to_owned()
+  out.write_string(text[cursor:].to_owned())
+  out.to_string()
 }
 
 ///|
