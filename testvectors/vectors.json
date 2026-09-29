@@ -528,6 +528,18 @@
       "mode": "config",
       "input": "stub ssh-rsa AAAAB3Nza short",
       "expect": []
+    },
+    {
+      "name": "pem-certificate-block",
+      "mode": "config",
+      "input": "tls -----BEGIN CERTIFICATE-----\nMIIBszCCAVmgAwIBAgIUX+abc123fake456def789ghi012\n-----END CERTIFICATE----- ok",
+      "expect": [
+        {
+          "kind": "PUBLIC_KEY",
+          "literal": "-----BEGIN CERTIFICATE-----\nMIIBszCCAVmgAwIBAgIUX+abc123fake456def789ghi012\n-----END CERTIFICATE-----",
+          "confidence": "HIGH"
+        }
+      ]
     }
   ]
 }

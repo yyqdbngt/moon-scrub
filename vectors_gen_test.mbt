@@ -694,10 +694,10 @@ test "vector: ipv6-double-compression-rejected" {
 ///|
 test "vector: phone-e164-cn" {
   let input = "call +8613800138000 now"
-  let findings = @moon_scrub.scan_with_config(input, {
-    ..@moon_scrub.ScanConfig::standard(),
-    detect_phone: true,
-  })
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    { ..@moon_scrub.ScanConfig::standard(), detect_phone: true },
+  )
   assert_eq(findings.length(), 1)
   assert_eq(findings[0].kind.to_string(), "PHONE")
   assert_eq(findings[0].start, 5)
@@ -712,10 +712,10 @@ test "vector: phone-e164-cn" {
 ///|
 test "vector: phone-e164-short-rejected" {
   let input = "ref +1234567 nope"
-  let findings = @moon_scrub.scan_with_config(input, {
-    ..@moon_scrub.ScanConfig::standard(),
-    detect_phone: true,
-  })
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    { ..@moon_scrub.ScanConfig::standard(), detect_phone: true },
+  )
   assert_eq(findings.length(), 0)
 }
 
@@ -755,4 +755,22 @@ test "vector: ssh-short-body-rejected" {
     @moon_scrub.ScanConfig::standard(),
   )
   assert_eq(findings.length(), 0)
+}
+
+///|
+test "vector: pem-certificate-block" {
+  let input = "tls -----BEGIN CERTIFICATE-----\nMIIBszCCAVmgAwIBAgIUX+abc123fake456def789ghi012\n-----END CERTIFICATE----- ok"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "PUBLIC_KEY")
+  assert_eq(findings[0].start, 4)
+  assert_eq(findings[0].end, 105)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "-----BEGIN CERTIFICATE-----\nMIIBszCCAVmgAwIBAgIUX+abc123fake456def789ghi012\n-----END CERTIFICATE-----",
+  )
 }

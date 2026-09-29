@@ -162,6 +162,25 @@ fn scan_jwt(text : String, out : Array[Finding]) -> Unit {
 }
 
 ///|
+/// A PEM footer runs to the closing `-----` dash run, not to end of line:
+/// trailing prose on the same line must stay outside the finding. Falls back
+/// to line end when the footer is truncated.
+fn pem_footer_end(text : String, from : Int) -> Int {
+  let mut k = from
+  while k + 5 <= text.length() && !starts_at(text, k, "-----") {
+    k += 1
+  }
+  if k + 5 <= text.length() {
+    return k + 5
+  }
+  let mut e = from
+  while e < text.length() && text[e].to_int() != 10 && text[e].to_int() != 13 {
+    e += 1
+  }
+  e
+}
+
+///|
 fn scan_private_keys(text : String, out : Array[Finding]) -> Unit {
   let begins = [
     "-----BEGIN PRIVATE KEY-----", "-----BEGIN RSA PRIVATE KEY-----", "-----BEGIN EC PRIVATE KEY-----",
@@ -176,11 +195,7 @@ fn scan_private_keys(text : String, out : Array[Finding]) -> Unit {
           end += 1
         }
         if end < text.length() {
-          while end < text.length() &&
-                text[end].to_int() != 10 &&
-                text[end].to_int() != 13 {
-            end += 1
-          }
+          end = pem_footer_end(text, end + 7)
         } else {
           end = text.length()
         }
@@ -865,6 +880,32 @@ fn scan_public_keys(text : String, out : Array[Finding]) -> Unit {
         if end - body_start >= 50 {
           push_finding(out, PublicKey, i, end, High)
         }
+      }
+    }
+  }
+  scan_certificates(text, out)
+}
+
+///|
+/// PEM certificate and CSR blocks: everything from a BEGIN marker through
+/// the end of its END line is public material worth flagging for hygiene.
+fn scan_certificates(text : String, out : Array[Finding]) -> Unit {
+  let begins = [
+    "-----BEGIN CERTIFICATE-----", "-----BEGIN TRUSTED CERTIFICATE-----", "-----BEGIN CERTIFICATE REQUEST-----",
+  ]
+  for i = 0; i < text.length(); i = i + 1 {
+    for begin in begins {
+      if starts_at(text, i, begin) {
+        let mut end = i + begin.length()
+        while end < text.length() && !starts_at(text, end, "-----END") {
+          end += 1
+        }
+        if end < text.length() {
+          end = pem_footer_end(text, end + 7)
+        } else {
+          end = text.length()
+        }
+        push_finding(out, PublicKey, i, end, High)
       }
     }
   }
