@@ -408,6 +408,36 @@
       "mode": "config",
       "input": "bad 02:00-5e:10-00:03 nope",
       "expect": []
+    },
+    {
+      "name": "uuid-canonical",
+      "mode": "config",
+      "input": "trace 550e8400-e29b-41d4-a716-446655440000 end",
+      "expect": [
+        {
+          "kind": "UUID",
+          "literal": "550e8400-e29b-41d4-a716-446655440000",
+          "confidence": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "name": "uuid-uppercase",
+      "mode": "config",
+      "input": "job A1B2C3D4-E5F6-4789-8ABC-DEF012345678 done",
+      "expect": [
+        {
+          "kind": "UUID",
+          "literal": "A1B2C3D4-E5F6-4789-8ABC-DEF012345678",
+          "confidence": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "name": "uuid-truncated-rejected",
+      "mode": "config",
+      "input": "short 550e8400-e29b-41d4-a716 nope",
+      "expect": []
     }
   ]
 }

@@ -675,6 +675,60 @@ fn scan_mac_addresses(text : String, out : Array[Finding]) -> Unit {
 }
 
 ///|
+/// Canonical 8-4-4-4-12 hexadecimal UUIDs. Reported at medium confidence:
+/// most occurrences are trace or entity identifiers, which are personal data
+/// only in specific contexts.
+fn scan_uuids(text : String, out : Array[Finding]) -> Unit {
+  let lengths = [8, 4, 4, 4, 12]
+  let mut i = 0
+  while i + 36 <= text.length() {
+    if is_ascii_hexdigit(text[i].to_int()) &&
+      (
+        i == 0 ||
+        (
+          !is_ascii_hexdigit(text[i - 1].to_int()) &&
+          !is_ascii_letter(text[i - 1].to_int())
+        )
+      ) {
+      let mut k = i
+      let mut ok = true
+      for group = 0; group < 5; group = group + 1 {
+        for _ in 0..<lengths[group] {
+          if k >= text.length() || !is_ascii_hexdigit(text[k].to_int()) {
+            ok = false
+            break
+          }
+          k += 1
+        }
+        if !ok {
+          break
+        }
+        if group < 4 {
+          if k >= text.length() || text[k].to_int() != 45 {
+            ok = false
+            break
+          }
+          k += 1
+        }
+      }
+      let tail = if k < text.length() { text[k].to_int() } else { -1 }
+      if ok &&
+        (
+          tail == -1 ||
+          (!is_ascii_hexdigit(tail) && !is_ascii_letter(tail) && tail != 45)
+        ) {
+        push_finding(out, Uuid, i, k, Medium)
+        i = k
+      } else {
+        i += 1
+      }
+    } else {
+      i += 1
+    }
+  }
+}
+
+///|
 fn run_detectors(
   text : String,
   config : ScanConfig,
@@ -712,6 +766,9 @@ fn run_detectors(
   }
   if config.detect_mac {
     scan_mac_addresses(text, out)
+  }
+  if config.detect_uuid {
+    scan_uuids(text, out)
   }
   if config.detect_payment_card {
     scan_cards(text, config.require_known_card_prefix, out)

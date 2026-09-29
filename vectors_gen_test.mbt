@@ -573,3 +573,49 @@ test "vector: mac-mixed-separators-rejected" {
   )
   assert_eq(findings.length(), 0)
 }
+
+///|
+test "vector: uuid-canonical" {
+  let input = "trace 550e8400-e29b-41d4-a716-446655440000 end"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "UUID")
+  assert_eq(findings[0].start, 6)
+  assert_eq(findings[0].end, 42)
+  assert_eq(findings[0].confidence, @moon_scrub.Medium)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "550e8400-e29b-41d4-a716-446655440000",
+  )
+}
+
+///|
+test "vector: uuid-uppercase" {
+  let input = "job A1B2C3D4-E5F6-4789-8ABC-DEF012345678 done"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "UUID")
+  assert_eq(findings[0].start, 4)
+  assert_eq(findings[0].end, 40)
+  assert_eq(findings[0].confidence, @moon_scrub.Medium)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "A1B2C3D4-E5F6-4789-8ABC-DEF012345678",
+  )
+}
+
+///|
+test "vector: uuid-truncated-rejected" {
+  let input = "short 550e8400-e29b-41d4-a716 nope"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 0)
+}
