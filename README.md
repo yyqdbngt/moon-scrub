@@ -116,8 +116,8 @@ moon run examples/bench --target native   # 吞吐与线性守门报告
 
 CI 在 wasm、wasm-gc、js、native 四后端执行格式检查、静态检查、构建、测试、日志流水
 线示例与性能基准；另有独立步骤校验跨语言向量文件与生成的 MoonBit 断言保持同步。当
-前核心实现约 1,900 行 MoonBit，10 个测试文件、106 个测试块；示例与文档不计入统计。
-Apache-2.0。
+当前核心实现约 4,800 行 MoonBit，30 个测试文件、212 个测试块、62 条跨语言向量，并有
+独立的 Python 参考实现作为差分门禁；示例与文档不计入统计。Apache-2.0。
 
 完整边界见 [安全模型](docs/security-model.md)，非正式申报参考稿见
 [proposal.md](docs/proposal.md)，发布证据见
