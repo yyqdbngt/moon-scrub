@@ -73,3 +73,11 @@ test "unicode content passes through unharmed" {
     "{\"msg\":\"中文日志 with password=[REDACTED:CREDENTIAL] value\"}",
   )
 }
+
+///|
+test "paths lists distinct finding locations in sorted order" {
+  let result = @moon_scrub.redact_json(
+    "{\"b\": \"demo@example.com\", \"a\": [\"x@example.com\", \"demo@example.com\"]}",
+  )
+  assert_eq(result.paths(), ["/a/0", "/a/1", "/b"])
+}

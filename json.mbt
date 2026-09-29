@@ -200,6 +200,22 @@ fn walk_json(
 ///|
 /// redact_json with caller-supplied exact-value rules applied to every
 /// string leaf in addition to the configured detectors.
+
+///|
+/// Distinct JSON-pointer-like paths that produced findings, sorted, so
+/// callers can compare document coverage across runs without values.
+pub fn JsonRedactionResult::paths(self : JsonRedactionResult) -> Array[String] {
+  let out : Array[String] = []
+  for item in self.findings {
+    if !out.contains(item.path) {
+      out.push(item.path)
+    }
+  }
+  sort_strings(out)
+  out
+}
+
+///|
 pub fn redact_json_with_rules(
   text : String,
   rules : Array[CustomRule],
