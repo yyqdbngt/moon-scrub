@@ -77,6 +77,47 @@ pub fn redact_fields(
 }
 
 ///|
+/// Redact structured fields under a full configuration, enabling
+/// post-0.1.0 families for callers that normalize records themselves.
+pub fn redact_fields_with_config(
+  fields : Array[StructuredField],
+  config : ScanConfig,
+  style? : RedactionStyle = Typed,
+) -> StructuredResult {
+  let output : Array[StructuredFieldResult] = []
+  let mut changed_fields = 0
+  let mut count = 0
+  for field in fields {
+    let sensitive_path = path_is_sensitive(field.path)
+    let findings = if sensitive_path && field.value.length() > 0 {
+      [
+        {
+          kind: CredentialAssignment,
+          start: 0,
+          end: field.value.length(),
+          confidence: High,
+        },
+      ]
+    } else {
+      scan_with_config(field.value, config)
+    }
+    let changed = findings.length() > 0
+    if changed {
+      changed_fields += 1
+    }
+    count += findings.length()
+    output.push({
+      path: field.path,
+      value: redact_with_findings(field.value, findings, style),
+      findings,
+      changed,
+      sensitive_path,
+    })
+  }
+  { fields: output, changed_fields, findings: count, }
+}
+
+///|
 /// Redact text with built-in and caller-supplied exact-value rules.
 pub fn redact_with_rules(
   text : String,

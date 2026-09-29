@@ -58,3 +58,20 @@ test "private key blocks and URL passwords are removed" {
   let url = @moon_scrub.redact("postgres://alice:s3cret@db.example/app")
   assert_eq(url.text, "postgres://[REDACTED:URL_CREDENTIAL]@db.example/app")
 }
+
+///|
+test "redact_fields_with_config enables new families per field" {
+  let result = @moon_scrub.redact_fields_with_config(
+    [
+      @moon_scrub.StructuredField::{
+        path: "device.mac",
+        value: "02:00:5e:10:00:03",
+      },
+      @moon_scrub.StructuredField::{ path: "user.name", value: "Ada", },
+    ],
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(result.changed_fields, 1)
+  assert_eq(result.fields[0].value, "[REDACTED:MAC_ADDRESS]")
+  assert_eq(result.fields[1].value, "Ada")
+}
