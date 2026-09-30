@@ -3,7 +3,7 @@
 ## 一、项目名称与坐标
 
 - 项目名称：Moon Scrub——面向日志、API 与 AI 工作流的敏感信息检测与脱敏引擎
-- 仓库：https://github.com/yyqdbngt/moon-scrub（自 2565d01 起 70 个提交，单一作者）
+- 仓库：https://github.com/yyqdbngt/moon-scrub（自 2565d01 起 73 个提交，单一作者）
 - MoonCakes：`123123213weqw/moon_scrub@0.4.0`（latest）
 - 许可证：Apache-2.0；纯 MoonBit，运行时零第三方依赖（仅 `moonbitlang/core`）
 
@@ -18,7 +18,38 @@
 契约；0.4.0 加入形态规则、高熵密钥检测与机器可读报告。当前规模：核心约 2,900 行
 MoonBit、32 个测试文件、163 个测试块、67 条跨语言向量、19 种检测类别。
 
-## 三、方向与应用场景
+## 三、使用示例
+
+基础脱敏（默认策略，三种样式可选，重复处理幂等）：
+
+```moonbit
+let result = redact("user=demo@example.com password=hunter2 ip=10.0.0.8")
+// result.text = "user=[REDACTED:EMAIL] password=[REDACTED:CREDENTIAL] ip=[REDACTED:IPV4]"
+verify_clean(result.text) // true：二次扫描无残留
+```
+
+按家族配置并注册自定义形态规则（小写十六进制、长度窗口）：
+
+```moonbit
+let config = {
+  ..ScanConfig::secrets_only(),
+  extra_patterns: [
+    PatternRule::{ prefix: "txn_", chars: HexLower, min_length: 20, max_length: 24 },
+  ],
+}
+scan_with_config("ref txn_3f9a2c81d07b4e5591", config) // 一条 ACCESS_TOKEN
+```
+
+JSON 文档脱敏（敏感路径 fail-closed，输出键序确定）与流式分块扫描：
+
+```moonbit
+let doc = redact_json("{\"user\": {\"email\": \"a@b.co\"}, \"password\": \"hunter2\"}")
+let scanner = ChunkScanner::new()          // overlap 窗口保证跨块秘密不丢
+for finding in scanner.push("token=ghp_1234567890abcdefghij\n") { /* 未落定，暂无输出 */ }
+for finding in scanner.finish() { /* 落定：ACCESS_TOKEN，绝对偏移 */ }
+```
+
+## 四、方向与应用场景
 
 定位为开发者安全工具与数据治理基础组件，覆盖四个通用场景：
 
@@ -31,7 +62,7 @@ MoonBit、32 个测试文件、163 个测试块、67 条跨语言向量、19 种
 4. **流式管道**：`ChunkScanner` 支持跨块秘密（上下文余量 + 去重，性质测试对多种
    切分验证与整扫等价），适配日志尾随与 socket 读取。
 
-## 四、核心能力（按 0.4.0 实测）
+## 五、核心能力（按 0.4.0 实测）
 
 **检测家族**（19 类，默认集合见 README 矩阵）：
 
@@ -53,7 +84,7 @@ MoonBit、32 个测试文件、163 个测试块、67 条跨语言向量、19 种
 无值报告、`ChunkScanner`（push/push_lines/finish）、batch/fields/JSON 各自的 rules
 与 config 变体、三种脱敏样式（全部幂等，含 PreserveLast4 的 marker 感知）。
 
-## 五、工程验证
+## 六、工程验证
 
 - **CI（四后端 × 全门禁）**：wasm/wasm-gc/js/native 各自执行 fmt 检查、静态检查、
   构建、测试；另有三道独立门禁——API 快照（`moon info`）同步、向量生成器同步、
@@ -66,7 +97,7 @@ MoonBit、32 个测试文件、163 个测试块、67 条跨语言向量、19 种
 - **发布验证**：每个版本走 dry-run（解压复检）→ publish 200 → 独立消费模块
   `moon add` 下载并跑冒烟测试，证据存 docs/release-verification.md。
 
-## 六、技术路线与边界
+## 七、技术路线与边界
 
 纯 MoonBit 单遍字符扫描 + 家族分派 + 互斥去重（排序后贪心），无正则引擎、无网络、
 无全局状态。两个被性质测试逼出来的深层修复值得一书：`StringBuilder::to_string` 在
@@ -78,14 +109,14 @@ MoonBit、32 个测试文件、163 个测试块、67 条跨语言向量、19 种
 误报与漏报，高敏感场景应使用完全标记样式并组合 `verify_clean` 二次验证；流式检测
 对超过 overlap 窗口的超长秘密可能切断。
 
-## 七、原创性与生态价值
+## 八、原创性与生态价值
 
 MoonBit 生态中未发现定位相同的通用包：同时提供多家族秘密检测、结构化 Finding
 （不含原值）、幂等脱敏、JSON/流式管线、跨语言向量契约与差分门禁的组合。向量文件
 （testvectors/vectors.json）配合 Python 参考实现，使任何语言的移植可以用同一份契约
 验证——这是"跨语言"从口号变成 CI 里的一个失败条件。
 
-## 八、演进记录
+## 九、演进记录
 
 - 0.1.0（2026-09-28）：初版检测、三种样式、批量摘要。
 - 0.2.0（2026-09-29）：可配置、抑制、JSON、流式、向量、基准。
