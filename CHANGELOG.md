@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.4.0 — 2026-09-30
+
+- PatternRule shape rules: prefix plus a constrained character class
+  (alnum-undash, hex variants, base64url, digits) inside a min/max
+  total-length window, for secrets whose alphabet is narrower than
+  generic token characters; a match stands only when the class owns the
+  whole run. Feeds the ACCESS_TOKEN family via
+  ScanConfig.extra_patterns.
+- Opt-in high-entropy secret detection: runs of 40+ credential-alphabet
+  characters with Shannon entropy at or above 4.75 bits per character
+  report as HIGH_ENTROPY_SECRET (medium confidence). The threshold is
+  calibrated to sit above English prose (~4.5) and base64-encoded prose
+  (~4.7) and below generated keys (~4.8+); enabled with
+  detect_high_entropy, off by default.
+- New token prefixes: lin_api_ (Linear), glc_ (Grafana Cloud), cko_
+  (Checkout.com), with vectors and the Python reference in lockstep.
+- explain_json: the explain report as a JSON array (kind, offsets,
+  confidence; sorted keys; integer-spelled numbers) for report
+  pipelines.
+
 ## 0.3.0 — 2026-09-29
 
 Fifty-commit push: thirteen new detector families, a reporting and

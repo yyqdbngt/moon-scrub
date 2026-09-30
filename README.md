@@ -12,8 +12,9 @@
   password/token/secret/api_key 等赋值。
 - 识别邮箱、IPv4，以及通过 Luhn 校验且命中主流卡组织 BIN 前缀的 13–19 位支付卡号。
 - `secrets_only` 与 `standard` 两种策略，以及按检测家族逐一开关的 `ScanConfig`。
-- 调用方可注册额外令牌前缀规则（`TokenPrefixRule`）与精确秘密规则
-  （`CustomRule`），规则值和标签不会进入 Finding 或输出标记。
+- 调用方可注册令牌前缀规则（`TokenPrefixRule`）、字符类+长度窗口的形态规则
+  （`PatternRule`）与精确秘密规则（`CustomRule`），规则值和标签不会进入
+  Finding 或输出标记。
 - 误报抑制：`v1.2.3.4` 等版本形态的 IPv4 不再上报，Luhn 有效但非卡组织前缀的长数字
   串按订单号处理；两类抑制都可以关闭。
 - 常量、带类型和保留末四位三种脱敏方式，全部满足重复处理幂等。
@@ -99,7 +100,9 @@ moon run examples/bench --target native   # 吞吐与线性守门报告
 | MAC / UUID | 标识 | 开 | Medium 置信 |
 | SSH 公钥 / 证书块 | 标识 | 开 | 卫生标记，非秘密 |
 | 钱包地址 | 标识 | 开 | 形态匹配，无校验和 |
+| Linear/Grafana/Checkout 前缀 | 凭据 | 开 | lin_api_ / glc_ / cko_ |
 | 电话（E.164） | 标识 | 关 | 显式开启 detect_phone |
+| 高熵密钥 | 凭据 | 关 | Shannon 熵 ≥4.75、40+ 字符，显式开启 detect_high_entropy |
 
 `ScanPolicy`（0.1.0 兼容面）只含凭据 + 邮箱/IPv4/卡号；新家族通过 `ScanConfig` 使用。
 
