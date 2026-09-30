@@ -291,6 +291,36 @@ pub fn explain(
 }
 
 ///|
+/// explain as a JSON array: one object per finding with kind, start,
+/// end, and confidence — no matched text anywhere. Fits report
+/// pipelines that already speak JSON.
+pub fn explain_json(
+  text : String,
+  config? : ScanConfig = ScanConfig::standard(),
+) -> String {
+  let items : Array[Json] = []
+  for finding in scan_with_config(text, config) {
+    let entry : Array[(String, Json)] = []
+    ignore(entry)
+    let obj : Map[String, Json] = Map([])
+    obj["confidence"] = Json::string(finding.confidence.to_string())
+    obj["end"] = Json::number(
+      finding.end.to_double(),
+      repr=finding.end.to_string(),
+    )
+    obj["kind"] = Json::string(finding.kind.to_string())
+    obj["start"] = Json::number(
+      finding.start.to_double(),
+      repr=finding.start.to_string(),
+    )
+    items.push(Json::object(obj))
+  }
+  let buf = StringBuilder()
+  write_json_value(Json::array(items), buf)
+  buf.to_string()
+}
+
+///|
 pub fn scan_full(
   text : String,
   rules : Array[CustomRule],
