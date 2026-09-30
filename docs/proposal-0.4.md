@@ -64,6 +64,24 @@ for finding in scanner.finish() { /* 落定：ACCESS_TOKEN，绝对偏移 */ }
 
 ## 五、核心能力（按 0.4.0 实测）
 
+**检测家族速览**（19 类；"默认开"指 `ScanConfig::standard()`）：
+
+| 家族 | 类别 | 默认 | 验证手段 |
+|---|---|---|---|
+| 服务前缀令牌（31 种） | 凭据 | 开 | 前缀+最小长度，分桶匹配 |
+| Bearer / Basic / JWT | 凭据 | 开 | 结构校验，marker 幂等 |
+| 私钥 PEM（7 种头） | 凭据 | 开 | BEGIN/END 配对，脚注感知 |
+| URL 内嵌凭据 | 凭据 | 开 | scheme://user:pass@host |
+| 敏感键赋值（22 键名） | 凭据 | 开 | 含 JSON 引号键 |
+| Slack/Discord webhook | 凭据 | 开 | 路径分段结构校验 |
+| 高熵密钥 | 凭据 | 关 | Shannon 熵 ≥4.75（opt-in） |
+| 邮箱 / IPv4 / IPv6 | 标识 | 开 | 域形/八位组/RFC 4291 复验 |
+| 支付卡 | 标识 | 开 | Luhn + 主流 BIN + Amex 分组 |
+| 身份证（GB 11643） | 标识 | 开 | 校验和 + 日历生日 |
+| MAC / UUID / 钱包地址 | 标识 | 开 | 形态匹配，Medium 置信 |
+| E.164 电话 | 标识 | 关 | opt-in |
+| SSH 公钥 / 证书块 | 标识 | 开 | 卫生标记（非秘密） |
+
 **检测家族**（19 类，默认集合见 README 矩阵）：
 
 - 凭据：31 种服务前缀（GitHub/GitLab/Slack/AWS/Google/Stripe/Anthropic/OpenAI/
