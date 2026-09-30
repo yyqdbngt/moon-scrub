@@ -52,3 +52,16 @@ import {
   2026-09-29 完成本地打包与解压复检（`Check passed`），服务端因当前环境凭据为
   `123123213weqw` 与模块归属 `yyqdbngt` 不符返回 403；正式发布需在 `yyqdbngt`
   登录态（`mooncake login`）下重跑 `moon publish` 后回填本节。
+
+## 0.3.0 独立消费验证 — 2026-09-30
+
+发布坐标 `123123213weqw/moon_scrub@0.3.0`（发布过程见上一节）。全新模块
+`probe/consume_scrub` 执行 `moon add 123123213weqw/moon_scrub@0.3.0`，`moon update`
+输出 `Downloading 123123213weqw/moon_scrub@0.3.0`；消费测试一次覆盖：
+
+- 三家族脱敏与 `verify_clean` 二次验证（email/credential/ipv4）；
+- `ScanConfig::standard()` 下的身份证检测（`RESIDENT_ID`）；
+- `ChunkScanner` 流式喂入跨块 token 并在 `finish` 落定。
+
+结果 `1/1` 通过。与 moon_pyversion 的经验一致：版本固定由 `moon add` 写入
+moon.mod 的 import，不要手写进 moon.pkg。该验证不引用开发仓库相对路径。
