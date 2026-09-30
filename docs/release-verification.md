@@ -65,3 +65,11 @@ import {
 
 结果 `1/1` 通过。与 moon_pyversion 的经验一致：版本固定由 `moon add` 写入
 moon.mod 的 import，不要手写进 moon.pkg。该验证不引用开发仓库相对路径。
+
+## 0.4.0 — 2026-09-30
+
+`moon publish` 于 `123123213weqw` 登录态执行，服务端 `200 OK`，坐标
+`123123213weqw/moon_scrub@0.4.0`。独立消费验证：全新模块 `moon add`，
+`Downloading ...@0.4.0`；测试一次覆盖 PatternRule 形态规则（HexLower 窗口）、
+高熵检测（HIGH_ENTROPY_SECRET）与 explain_json 输出，`1/1` 通过。内容：
+形态规则、高熵检测（opt-in）、Linear/Grafana/Checkout 前缀、explain_json。
