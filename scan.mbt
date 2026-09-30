@@ -120,6 +120,9 @@ fn run_detectors(
   if config.detect_phone {
     scan_phones(text, out)
   }
+  if config.detect_high_entropy {
+    scan_high_entropy(text, out)
+  }
   if config.detect_public_key {
     scan_public_keys(text, out)
   }

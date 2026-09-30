@@ -68,6 +68,7 @@ pub(all) struct ScanConfig {
   detect_wallet : Bool
   detect_public_key : Bool
   detect_phone : Bool
+  detect_high_entropy : Bool
   detect_ipv6 : Bool
   detect_uuid : Bool
   detect_mac : Bool
@@ -105,6 +106,7 @@ pub fn ScanConfig::standard() -> ScanConfig {
     detect_wallet: true,
     detect_public_key: true,
     detect_phone: false,
+    detect_high_entropy: false,
     detect_ipv6: true,
     detect_uuid: true,
     detect_mac: true,
@@ -130,6 +132,7 @@ pub fn ScanConfig::secrets_only() -> ScanConfig {
     detect_wallet: false,
     detect_public_key: false,
     detect_phone: false,
+    detect_high_entropy: false,
     detect_ipv6: false,
     detect_uuid: false,
     detect_mac: false,

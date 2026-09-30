@@ -20,6 +20,7 @@ pub(all) enum SensitiveKind {
   PublicKey
   WalletAddress
   WebhookUrl
+  HighEntropySecret
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -42,6 +43,7 @@ pub fn SensitiveKind::to_string(self : SensitiveKind) -> String {
     UrlCredential => "URL_CREDENTIAL"
     CustomSecret => "CUSTOM_SECRET"
     ResidentId => "RESIDENT_ID"
+    HighEntropySecret => "HIGH_ENTROPY_SECRET"
     WebhookUrl => "WEBHOOK_URL"
     WalletAddress => "WALLET_ADDRESS"
     PublicKey => "PUBLIC_KEY"
@@ -162,6 +164,7 @@ pub(all) struct BatchSummary {
   mut public_keys : Int
   mut wallet_addresses : Int
   mut webhook_urls : Int
+  mut high_entropy_secrets : Int
 } derive(Eq, @debug.Debug)
 
 ///|

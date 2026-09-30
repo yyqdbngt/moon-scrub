@@ -22,6 +22,7 @@ fn empty_summary(lines : Int) -> BatchSummary {
     public_keys: 0,
     wallet_addresses: 0,
     webhook_urls: 0,
+    high_entropy_secrets: 0,
   }
 }
 
@@ -41,6 +42,7 @@ fn tally(summary : BatchSummary, findings : Array[Finding]) -> Unit {
       UrlCredential => summary.url_credentials += 1
       CustomSecret => summary.custom_secrets += 1
       ResidentId => summary.resident_ids += 1
+      HighEntropySecret => summary.high_entropy_secrets += 1
       MacAddress => summary.mac_addresses += 1
       Uuid => summary.uuids += 1
       Ipv6 => summary.ipv6s += 1
