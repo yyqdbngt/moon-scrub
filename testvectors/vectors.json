@@ -672,6 +672,30 @@
           "confidence": "HIGH"
         }
       ]
+    },
+    {
+      "name": "linear-api-key",
+      "mode": "secrets",
+      "input": "linear lin_api_9abcdefghijKLMNOPqrst",
+      "expect": [
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "lin_api_9abcdefghijKLMNOPqrst",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "grafana-service-account-token",
+      "mode": "secrets",
+      "input": "grafana glc_eyJabc123defGHI456",
+      "expect": [
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "glc_eyJabc123defGHI456",
+          "confidence": "HIGH"
+        }
+      ]
     }
   ]
 }

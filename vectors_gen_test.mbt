@@ -952,3 +952,39 @@ test "vector: assignment-value-in-call-args" {
   assert_eq(findings[0].confidence, @moon_scrub.High)
   assert_eq(input[findings[0].start:findings[0].end].to_owned(), "hunter2")
 }
+
+///|
+test "vector: linear-api-key" {
+  let input = "linear lin_api_9abcdefghijKLMNOPqrst"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 7)
+  assert_eq(findings[0].end, 36)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "lin_api_9abcdefghijKLMNOPqrst",
+  )
+}
+
+///|
+test "vector: grafana-service-account-token" {
+  let input = "grafana glc_eyJabc123defGHI456"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 8)
+  assert_eq(findings[0].end, 30)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "glc_eyJabc123defGHI456",
+  )
+}
