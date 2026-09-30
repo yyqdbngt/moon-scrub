@@ -1,4 +1,38 @@
 ///|
+/// Character vocabulary a custom pattern rule matches after its prefix.
+pub(all) enum CharClass {
+  AlnumUndash
+  HexLower
+  HexAny
+  Base64Url
+  Digits
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CharClass with Eq::{equal, not_equal}
+
+///|
+pub extend CharClass with @debug.Debug::{to_repr}
+
+///|
+/// A caller-defined shape rule: a prefix followed by `min_length` to
+/// `max_length` total code units drawn from a character class. More
+/// expressive than TokenPrefixRule when secrets carry a constrained
+/// alphabet, e.g. lowercase-hex transaction ids or numeric tenant keys.
+pub(all) struct PatternRule {
+  prefix : String
+  chars : CharClass
+  min_length : Int
+  max_length : Int
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend PatternRule with Eq::{equal, not_equal}
+
+///|
+pub extend PatternRule with @debug.Debug::{to_repr}
+
+///|
 /// A caller-defined prefixed-token rule. `min_length` is the minimum total
 /// match length including the prefix. Prefixes shorter than two code units or
 /// minimums below the prefix length are ignored to limit accidental broad
@@ -44,6 +78,7 @@ pub(all) struct ScanConfig {
   /// dominate test-suite output and drown real findings.
   suppress_example_domains : Bool
   extra_prefixes : Array[TokenPrefixRule]
+  extra_patterns : Array[PatternRule]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -77,6 +112,7 @@ pub fn ScanConfig::standard() -> ScanConfig {
     require_known_card_prefix: true,
     suppress_example_domains: false,
     extra_prefixes: [],
+    extra_patterns: [],
   }
 }
 

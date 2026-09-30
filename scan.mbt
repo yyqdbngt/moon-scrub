@@ -88,6 +88,7 @@ fn run_detectors(
   let lower = if needs_lower { ascii_lower(text) } else { "" }
   if config.detect_access_token {
     scan_prefixed_tokens(text, config.extra_prefixes, out)
+    scan_pattern_rules(text, config.extra_patterns, out)
   }
   if config.detect_bearer {
     scan_bearer(text, lower, out)

@@ -78,6 +78,57 @@ fn sort_specs(items : Array[TokenPrefixRule]) -> Unit {
 }
 
 ///|
+fn char_class_match(chars : CharClass, c : Int) -> Bool {
+  match chars {
+    AlnumUndash => is_ascii_alnum(c) || c == 45 || c == 95
+    HexLower => (c >= 48 && c <= 57) || (c >= 97 && c <= 102)
+    HexAny => is_ascii_hexdigit(c)
+    Base64Url => is_base64url(c)
+    Digits => is_ascii_digit(c)
+  }
+}
+
+///|
+/// Scan caller-supplied shape rules: prefix, then a run in the rule's
+/// character class whose total span lands inside the length window.
+fn scan_pattern_rules(
+  text : String,
+  rules : Array[PatternRule],
+  out : Array[Finding],
+) -> Unit {
+  for rule in rules {
+    if rule.prefix.length() < 2 ||
+      rule.min_length < rule.prefix.length() ||
+      rule.max_length < rule.min_length {
+      continue
+    }
+    let mut i = 0
+    while i + rule.prefix.length() <= text.length() {
+      if starts_at(text, i, rule.prefix) {
+        let mut end = i + rule.prefix.length()
+        while end < text.length() &&
+              end - i < rule.max_length &&
+              char_class_match(rule.chars, text[end].to_int()) {
+          end += 1
+        }
+        // Do not cut a match short in the middle of a class run: a longer
+        // neighbour would mean this shape does not own the token.
+        let tail_ok = end >= text.length() ||
+          !char_class_match(rule.chars, text[end].to_int())
+        if tail_ok && end - i >= rule.min_length {
+          push_finding(out, AccessToken, i, end, High)
+          i = end
+        } else {
+          i += 1
+        }
+      } else {
+        i += 1
+      }
+    }
+  }
+}
+
+///|
 fn scan_prefixed_tokens(
   text : String,
   extra : Array[TokenPrefixRule],
