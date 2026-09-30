@@ -4,8 +4,7 @@
 
 - 项目名称：Moon Scrub——面向日志、API 与 AI 工作流的敏感信息检测与脱敏引擎
 - 仓库：https://github.com/yyqdbngt/moon-scrub（自 2565d01 起 70 个提交，单一作者）
-- MoonCakes：`123123213weqw/moon_scrub@0.4.0`（latest；0.1.0 历史坐标
-  `yyqdbngt/moon_scrub` 仍在注册表，见发布记录说明）
+- MoonCakes：`123123213weqw/moon_scrub@0.4.0`（latest）
 - 许可证：Apache-2.0；纯 MoonBit，运行时零第三方依赖（仅 `moonbitlang/core`）
 
 ## 二、项目简介
