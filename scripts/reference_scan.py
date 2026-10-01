@@ -242,7 +242,9 @@ def scan_ipv4(text, out):
         start, end = m.start(), m.start() + valid
         before = text[start - 1] if start > 0 else ""
         after = text[end] if end < len(text) else ""
-        if (before.isalnum() or before in ".-_") or (after.isalnum() or after in "-_"):
+        # Empty boundary strings must not count: '' in "-_" is True in Python.
+        if (before != "" and (before.isalnum() or before in ".-_")) or \
+           (after != "" and (after.isalnum() or after in "-_")):
             continue
         push(out, "IPV4", start, end, "MEDIUM")
 
@@ -307,7 +309,7 @@ def scan_resident_ids(text, out):
             body = text[i:end - 1]
             if body.isdigit() and (last.isdigit() or last in "Xx"):
                 after = text[end] if end < len(text) else ""
-                if after.isalnum() or after in "-_":
+                if after != "" and (after.isalnum() or after in "-_"):
                     i += 1
                     continue
                 checksum = ORDER[sum(int(d) * w for d, w in zip(body, WEIGHTS)) % 11]
@@ -520,3 +522,51 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# --- Library-level port: redaction, summaries, and reports -------------
+
+KIND_ORDER_RUN = None  # findings come sorted from scan_all
+
+
+def replacement(kind, style="typed"):
+    if style == "marker":
+        return "[REDACTED]"
+    if style == "last4":
+        return None  # needs the matched text; handled in redact()
+    return f"[REDACTED:{kind}]"
+
+
+def redact(text, style="typed", mode="config"):
+    findings = non_overlapping(scan_all(text, mode))
+    out = []
+    cursor = 0
+    for kind, start, end, _conf in findings:
+        out.append(text[cursor:start])
+        if style == "marker":
+            out.append("[REDACTED]")
+        elif style == "last4" and end - start > 4:
+            out.append(f"[REDACTED:{kind}:*{text[end - 4:end]}]")
+        else:
+            out.append(f"[REDACTED:{kind}]")
+        cursor = end
+    out.append(text[cursor:])
+    return "".join(out), len(findings)
+
+
+def verify_clean(text, mode="config"):
+    return len(non_overlapping(scan_all(text, mode))) == 0
+
+
+def findings_summary(text, mode="config"):
+    counts = {}
+    for kind, _s, _e, _c in non_overlapping(scan_all(text, mode)):
+        counts[kind] = counts.get(kind, 0) + 1
+    return sorted(counts.items(), key=lambda kv: kv[0])
+
+
+def explain(text, mode="config"):
+    return [
+        f"{kind} {start}-{end} {conf}"
+        for kind, start, end, conf in non_overlapping(scan_all(text, mode))
+    ]

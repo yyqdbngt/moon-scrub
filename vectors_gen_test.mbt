@@ -1178,3 +1178,33 @@ test "vector: ipv6-triple-colon-rejected" {
   )
   assert_eq(findings.length(), 0)
 }
+
+///|
+test "vector: ipv4-at-string-start" {
+  let input = "10.0.0.8 first hop"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "IPV4")
+  assert_eq(findings[0].start, 0)
+  assert_eq(findings[0].end, 8)
+  assert_eq(findings[0].confidence, @moon_scrub.Medium)
+  assert_eq(input[findings[0].start:findings[0].end].to_owned(), "10.0.0.8")
+}
+
+///|
+test "vector: ipv4-at-string-end" {
+  let input = "last hop 10.0.0.9"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "IPV4")
+  assert_eq(findings[0].start, 9)
+  assert_eq(findings[0].end, 17)
+  assert_eq(findings[0].confidence, @moon_scrub.Medium)
+  assert_eq(input[findings[0].start:findings[0].end].to_owned(), "10.0.0.9")
+}

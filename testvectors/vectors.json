@@ -804,6 +804,30 @@
       "mode": "config",
       "input": "no 1:::2 here",
       "expect": []
+    },
+    {
+      "name": "ipv4-at-string-start",
+      "mode": "config",
+      "input": "10.0.0.8 first hop",
+      "expect": [
+        {
+          "kind": "IPV4",
+          "literal": "10.0.0.8",
+          "confidence": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "name": "ipv4-at-string-end",
+      "mode": "config",
+      "input": "last hop 10.0.0.9",
+      "expect": [
+        {
+          "kind": "IPV4",
+          "literal": "10.0.0.9",
+          "confidence": "MEDIUM"
+        }
+      ]
     }
   ]
 }
