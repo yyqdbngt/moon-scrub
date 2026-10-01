@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.5.2 — 2026-10-01
+
+- New prefixes: LTAI (Alibaba Cloud AccessKey IDs — the first
+  mainland-cloud entry) and sntrys_ (Sentry SDK auth tokens); 81
+  vectors, both implementations agreeing.
+- The Python reference is now a complete second implementation:
+  redact_json (fail-closed fallback included) and a full ChunkScanner
+  port (overlap window, context margin, dedup-on-retreat) join the
+  scanner, redaction, summaries, and reports.
+- The library differential grew to 155 lines across four API domains —
+  raw findings, typed redaction, JSON documents, and seven-character
+  chunked streaming — and a seeded fuzz mode (300 random lines, seven
+  secret templates) runs in CI; aligning it caught a generator skew
+  where the ip template consumed different word counts per side.
+
 ## 0.5.1 — 2026-10-01
 
 - Fixed: 1:::2 (a triple-colon compression) was reported as IPV6; the
