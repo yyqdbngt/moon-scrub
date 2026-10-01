@@ -1078,3 +1078,93 @@ test "vector: pattern-rule-digit-window" {
     "acct-12345678",
   )
 }
+
+///|
+test "vector: pypi-upload-token" {
+  let input = "upload pypi-AgEIcHlwaS5vcmcJYXJlZ2lzdGVyZWR0b2tlbg0000000 done"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 7)
+  assert_eq(findings[0].end, 57)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "pypi-AgEIcHlwaS5vcmcJYXJlZ2lzdGVyZWR0b2tlbg0000000",
+  )
+}
+
+///|
+test "vector: gitlab-runner-token" {
+  let input = "runner glrt-1234567890abcdefghij step"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 7)
+  assert_eq(findings[0].end, 32)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "glrt-1234567890abcdefghij",
+  )
+}
+
+///|
+test "vector: google-oauth-refresh" {
+  let input = "refresh 1//0gEXAMPLEfake0000000000000000000000000000 token"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 8)
+  assert_eq(findings[0].end, 52)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "1//0gEXAMPLEfake0000000000000000000000000000",
+  )
+}
+
+///|
+test "vector: atlassian-token" {
+  let input = "jira ATATTx3fake0000000000000000000000000000000 end"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 5)
+  assert_eq(findings[0].end, 47)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "ATATTx3fake0000000000000000000000000000000",
+  )
+}
+
+///|
+test "vector: slack-rotation-token" {
+  let input = "rot xoxe.x-xcs-123456789012-1234567890123 done"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 4)
+  assert_eq(findings[0].end, 41)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "xoxe.x-xcs-123456789012-1234567890123",
+  )
+}

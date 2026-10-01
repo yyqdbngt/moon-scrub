@@ -738,6 +738,66 @@
           "confidence": "HIGH"
         }
       ]
+    },
+    {
+      "name": "pypi-upload-token",
+      "mode": "secrets",
+      "input": "upload pypi-AgEIcHlwaS5vcmcJYXJlZ2lzdGVyZWR0b2tlbg0000000 done",
+      "expect": [
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "pypi-AgEIcHlwaS5vcmcJYXJlZ2lzdGVyZWR0b2tlbg0000000",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "gitlab-runner-token",
+      "mode": "secrets",
+      "input": "runner glrt-1234567890abcdefghij step",
+      "expect": [
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "glrt-1234567890abcdefghij",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "google-oauth-refresh",
+      "mode": "secrets",
+      "input": "refresh 1//0gEXAMPLEfake0000000000000000000000000000 token",
+      "expect": [
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "1//0gEXAMPLEfake0000000000000000000000000000",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "atlassian-token",
+      "mode": "secrets",
+      "input": "jira ATATTx3fake0000000000000000000000000000000 end",
+      "expect": [
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "ATATTx3fake0000000000000000000000000000000",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "slack-rotation-token",
+      "mode": "secrets",
+      "input": "rot xoxe.x-xcs-123456789012-1234567890123 done",
+      "expect": [
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "xoxe.x-xcs-123456789012-1234567890123",
+          "confidence": "HIGH"
+        }
+      ]
     }
   ]
 }
