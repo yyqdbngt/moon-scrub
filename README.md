@@ -122,7 +122,7 @@ CI 在 wasm、wasm-gc、js、native 四后端执行格式检查、静态检查�
 当前核心实现约 4,800 行 MoonBit，30 个测试文件、212 个测试块、62 条跨语言向量，并有
 独立的 Python 参考实现作为差分门禁；示例与文档不计入统计。Apache-2.0。
 
-完整边界见 [安全模型](docs/security-model.md)，申报参考稿见
+常用场景配方见 [配方手册](docs/cookbook.md)；完整边界见 [安全模型](docs/security-model.md)，申报参考稿见
 [proposal.md](docs/proposal.md)（0.1.0 初稿）与
 [proposal-0.4.md](docs/proposal-0.4.md)（现行版），发布证据见
 [release-verification.md](docs/release-verification.md)。

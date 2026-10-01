@@ -263,6 +263,12 @@ pub fn redact_json_with_rules(
 }
 
 ///|
+/// ```mbt check
+/// test {
+///   let doc = @moon_scrub.redact_json("{\"k\": \"password=hunter2\"}")
+///   inspect(doc.text, content="{\"k\":\"password=[REDACTED:CREDENTIAL]\"}")
+/// }
+/// ```
 pub fn redact_json(
   text : String,
   config? : ScanConfig = ScanConfig::standard(),

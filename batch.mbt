@@ -93,8 +93,12 @@ pub fn redact_batch_with_config(
 }
 
 ///|
-/// Redact independent log/API/prompt lines and return aggregate counts. The
-/// summary contains categories and counts only, never matched values.
+/// ```mbt check
+/// test {
+///   let result = @moon_scrub.redact_batch(["password=x", "plain"])
+///   inspect(result.summary.changed_lines, content="1")
+/// }
+/// ```
 pub fn redact_batch(
   lines : Array[String],
   style? : RedactionStyle = Typed,

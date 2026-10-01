@@ -25,8 +25,15 @@ fn replacement(
 }
 
 ///|
-/// Redact all enabled findings. Already-produced markers contain no detector
-/// pattern, so applying the same policy again is idempotent.
+/// ```mbt check
+/// test {
+///   let result = @moon_scrub.redact("user=demo@example.com password=x")
+///   inspect(
+///     result.text,
+///     content="user=[REDACTED:EMAIL] password=[REDACTED:CREDENTIAL]",
+///   )
+/// }
+/// ```
 pub fn redact(
   text : String,
   style? : RedactionStyle = Typed,
@@ -69,7 +76,12 @@ pub fn redact_full(
 }
 
 ///|
-/// Return true only when a fresh scan finds no enabled sensitive values.
+/// ```mbt check
+/// test {
+///   let clean = @moon_scrub.redact("password=hunter2").text
+///   inspect(@moon_scrub.verify_clean(clean), content="true")
+/// }
+/// ```
 pub fn verify_clean(
   text : String,
   policy? : ScanPolicy = ScanPolicy::standard(),

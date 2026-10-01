@@ -47,9 +47,20 @@ pub fn ChunkScanner::new(
 }
 
 ///|
-/// Consume one chunk and return every finding whose end position is settled:
-/// at least `overlap` code units of later data exist, so no future chunk can
-/// extend or start a match overlapping it.
+/// ```mbt check
+/// test {
+///   let scanner = @moon_scrub.ChunkScanner::new(overlap=64)
+///   inspect(
+///     scanner
+///     .push(
+///       "token=ghp_1234567890abcdefghij " +
+///       "padding padding padding padding padding padding padding padding",
+///     )
+///     .length(),
+///     content="1",
+///   )
+/// }
+/// ```
 pub fn ChunkScanner::push(
   self : ChunkScanner,
   chunk : String,
@@ -132,8 +143,13 @@ pub fn ChunkScanner::push_lines(
 }
 
 ///|
-/// Flush the remaining tail and close the stream. Chunks pushed afterwards
-/// are ignored.
+/// ```mbt check
+/// test {
+///   let scanner = @moon_scrub.ChunkScanner::new(overlap=64)
+///   ignore(scanner.push("password=hunter2 padding padding padding padding"))
+///   inspect(scanner.finish().length(), content="1")
+/// }
+/// ```
 pub fn ChunkScanner::finish(self : ChunkScanner) -> Array[Finding] {
   if self.finished {
     return []

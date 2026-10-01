@@ -162,8 +162,13 @@ pub fn scan(
 }
 
 ///|
-/// Scan with full control over detector families, suppressors and extra
-/// prefixed-token rules.
+/// ```mbt check
+/// test {
+///   let config = @moon_scrub.ScanConfig::secrets_only()
+///   let findings = @moon_scrub.scan_with_config("ip 10.0.0.8", config)
+///   inspect(findings.length(), content="0")
+/// }
+/// ```
 pub fn scan_with_config(text : String, config : ScanConfig) -> Array[Finding] {
   let out : Array[Finding] = []
   run_detectors(text, config, out)
@@ -186,8 +191,14 @@ pub fn scan_with_rules(
 /// Unified entry point combining exact-value rules with a full configuration.
 
 ///|
-/// Count findings by kind without producing redacted text. Ordered by kind
-/// name for deterministic output; counts only, never values.
+/// ```mbt check
+/// test {
+///   let rows = @moon_scrub.findings_summary("a@b.co x@y.org")
+///   inspect(rows.length(), content="1")
+///   inspect(rows[0].kind.to_string(), content="EMAIL")
+///   inspect(rows[0].count, content="2")
+/// }
+/// ```
 pub fn findings_summary(
   text : String,
   config? : ScanConfig = ScanConfig::standard(),
@@ -226,9 +237,12 @@ pub fn findings_summary(
 ///|
 
 ///|
-/// Scan while keeping caller-certified literals in place: any finding that
-/// overlaps a kept literal is dropped. Keep values shorter than four code
-/// units are ignored so a tiny string cannot neuter whole families.
+/// ```mbt check
+/// test {
+///   let kept = @moon_scrub.scan_except("ip 10.0.0.1 ip 10.0.0.2", ["10.0.0.1"])
+///   inspect(kept.length(), content="1")
+/// }
+/// ```
 pub fn scan_except(
   text : String,
   keep : Array[String],
@@ -268,9 +282,13 @@ pub fn scan_except(
 ///|
 
 ///|
-/// Human-readable, value-free finding report: one line per finding in the
-/// form `KIND start-end CONFIDENCE`. Safe to print because it never
-/// contains matched text.
+/// ```mbt check
+/// test {
+///   let lines = @moon_scrub.explain("mail a@b.co")
+///   inspect(lines.length(), content="1")
+///   inspect(lines[0], content="EMAIL 5-11 HIGH")
+/// }
+/// ```
 pub fn explain(
   text : String,
   config? : ScanConfig = ScanConfig::standard(),
