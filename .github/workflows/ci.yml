@@ -39,3 +39,11 @@ jobs:
       - run: moon run examples/bench --target ${{ matrix.target }}
       - run: moon run examples/json-pipeline --target ${{ matrix.target }}
       - run: moon run examples/stream-pipeline --target ${{ matrix.target }}
+      - name: Report coverage (production gate on native)
+        if: matrix.target == 'native'
+        run: |
+          moon coverage analyze > coverage.txt 2>&1 || true
+          tail -1 coverage.txt
+          PROD=$(grep -oE '[0-9]+ uncovered line\(s\) in [a-z_]+\.mbt' coverage.txt | grep -v examples | grep -oE '^[0-9]+' | paste -sd+ - | bc)
+          echo "production uncovered lines: ${PROD:-0}"
+          if [ "${PROD:-0}" -gt 25 ]; then echo "coverage regression"; exit 1; fi
