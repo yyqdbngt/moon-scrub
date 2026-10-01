@@ -143,7 +143,7 @@ pub extend RedactionResult with @debug.Debug::{to_repr}
 
 ///|
 pub(all) struct BatchSummary {
-  lines : Int
+  mut lines : Int
   mut changed_lines : Int
   mut findings : Int
   mut access_tokens : Int

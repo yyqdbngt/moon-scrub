@@ -187,3 +187,46 @@ test "chunked scanning equals whole scanning on generated corpora" {
     }
   }
 }
+
+///|
+test "streaming summary accumulates across pushes and finish" {
+  // overlap clamps to 64, so the corpus must exceed 80 units to settle.
+  let scanner = @moon_scrub.ChunkScanner::new(overlap=64)
+  ignore(
+    scanner.push(
+      "password=hunter2 " +
+      "padding padding padding padding padding padding padding padding",
+    ),
+  )
+  let early = scanner.summary()
+  assert_eq(early.credentials, 1)
+  ignore(
+    scanner.push(
+      "token=ghp_1234567890abcdefghij " +
+      "padding padding padding padding padding padding padding padding",
+    ),
+  )
+  let later = scanner.summary()
+  assert_eq(later.lines, 2)
+  assert_eq(later.credentials, 1)
+  ignore(scanner.finish())
+  let done = scanner.summary()
+  assert_eq(done.findings, 2)
+  assert_eq(done.access_tokens, 1)
+  assert_eq(done.credentials, 1)
+}
+
+///|
+test "batch and streaming summaries agree on line input" {
+  let lines = [
+    "login demo@example.com", "auth: Bearer abcdefghijklmnop", "plain line",
+  ]
+  let scanner = @moon_scrub.ChunkScanner::new(overlap=64)
+  ignore(scanner.push_lines(lines))
+  ignore(scanner.finish())
+  let streamed = scanner.summary()
+  let batched = @moon_scrub.redact_batch(lines).summary
+  assert_eq(streamed.emails, batched.emails)
+  assert_eq(streamed.bearer_tokens, batched.bearer_tokens)
+  assert_eq(streamed.findings, batched.findings)
+}

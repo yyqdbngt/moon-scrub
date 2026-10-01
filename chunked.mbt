@@ -15,6 +15,7 @@ struct ChunkScanner {
   mut base : Int
   mut finished : Bool
   mut emitted_until : Int
+  tallied : BatchSummary
 }
 
 ///|
@@ -41,6 +42,7 @@ pub fn ChunkScanner::new(
     base: 0,
     finished: false,
     emitted_until: 0,
+    tallied: empty_summary(0),
   }
 }
 
@@ -55,6 +57,7 @@ pub fn ChunkScanner::push(
   if self.finished || chunk.length() == 0 {
     return []
   }
+  self.tallied.lines += 1
   self.buffer.write_string(chunk)
   let window = self.buffer.to_string()
   // to_string hands off the backing array when it is exactly full, so the
@@ -81,6 +84,8 @@ pub fn ChunkScanner::push(
           confidence: finding.confidence,
         })
         self.emitted_until = self.base + finding.end
+        tally(self.tallied, [finding])
+        self.tallied.findings += 1
       }
       drop = finding.end
     } else {
@@ -101,6 +106,14 @@ pub fn ChunkScanner::push(
   self.buffer = StringBuilder()
   self.buffer.write_string(kept)
   settled
+}
+
+///|
+/// Running aggregate over everything emitted so far. `lines` counts
+/// non-empty pushes; category counters match BatchSummary. Returns a
+/// copy — BatchSummary is plain integers.
+pub fn ChunkScanner::summary(self : ChunkScanner) -> BatchSummary {
+  self.tallied
 }
 
 ///|
@@ -139,6 +152,8 @@ pub fn ChunkScanner::finish(self : ChunkScanner) -> Array[Finding] {
         end: self.base + finding.end,
         confidence: finding.confidence,
       })
+      tally(self.tallied, [finding])
+      self.tallied.findings += 1
     }
   }
   self.buffer = StringBuilder()
