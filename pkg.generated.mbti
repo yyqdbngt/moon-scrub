@@ -63,7 +63,7 @@ pub fn BatchResult::not_equal(Self, Self) -> Bool
 pub fn BatchResult::to_repr(Self) -> @debug.Repr
 
 pub(all) struct BatchSummary {
-  lines : Int
+  mut lines : Int
   mut changed_lines : Int
   mut findings : Int
   mut access_tokens : Int
@@ -106,6 +106,7 @@ pub fn ChunkScanner::finish(Self) -> Array[Finding]
 pub fn ChunkScanner::new(config? : ScanConfig, overlap? : Int) -> Self
 pub fn ChunkScanner::push(Self, String) -> Array[Finding]
 pub fn ChunkScanner::push_lines(Self, Array[String]) -> Array[Finding]
+pub fn ChunkScanner::summary(Self) -> BatchSummary
 
 pub(all) enum Confidence {
   High
