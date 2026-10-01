@@ -25,7 +25,7 @@ TOKEN_SPECS = [
     ("shpca_", 14), ("shppa_", 14), ("ghp_", 12), ("gho_", 12), ("ghu_", 12),
     ("ghs_", 12), ("ghr_", 12), ("gha_", 12), ("xoxb-", 13), ("xoxp-", 13),
     ("xoxc-", 13), ("xoxa-", 13), ("xoxr-", 13), ("glpat-", 14), ("npm_", 12), ("lin_api_", 24), ("glc_", 20), ("cko_", 20), ("key-", 32), ("nfp_", 40),
-    ("pypi-AgEIcHlwaS5vcmc", 40), ("glrt-", 25), ("xoxe.x-xcs-", 30), ("ATATTx", 40), ("1//", 40),
+    ("pypi-AgEIcHlwaS5vcmc", 40), ("glrt-", 25), ("xoxe.x-xcs-", 30), ("ATATTx", 40), ("1//", 40), ("LTAI", 20), ("sntrys_", 40),
     ("AIza", 20), ("AKIA", 20), ("ASIA", 20), ("SG.", 20), ("sk-", 11),
 ]
 TOKEN_SPECS.sort(key=lambda p: -len(p[0]))

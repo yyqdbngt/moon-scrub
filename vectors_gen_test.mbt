@@ -1208,3 +1208,39 @@ test "vector: ipv4-at-string-end" {
   assert_eq(findings[0].confidence, @moon_scrub.Medium)
   assert_eq(input[findings[0].start:findings[0].end].to_owned(), "10.0.0.9")
 }
+
+///|
+test "vector: aliyun-access-key-id" {
+  let input = "oss LTAI4Gfake0000000000mRxS end"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 4)
+  assert_eq(findings[0].end, 28)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "LTAI4Gfake0000000000mRxS",
+  )
+}
+
+///|
+test "vector: sentry-dsn-token" {
+  let input = "sentry sntrys_eyJpYXQiOjE3Mfake00000000000000000 log"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 7)
+  assert_eq(findings[0].end, 48)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "sntrys_eyJpYXQiOjE3Mfake00000000000000000",
+  )
+}

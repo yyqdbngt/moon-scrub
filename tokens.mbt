@@ -39,6 +39,8 @@ fn builtin_token_specs() -> Array[TokenPrefixRule] {
     { prefix: "xoxe.x-xcs-", min_length: 30, },
     { prefix: "ATATTx", min_length: 40, },
     { prefix: "1//", min_length: 40, },
+    { prefix: "LTAI", min_length: 20, },
+    { prefix: "sntrys_", min_length: 40, },
     { prefix: "AIza", min_length: 20, },
     { prefix: "AKIA", min_length: 20, },
     { prefix: "ASIA", min_length: 20, },
