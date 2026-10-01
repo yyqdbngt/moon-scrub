@@ -86,10 +86,10 @@ def emit(doc) -> str:
             # moon fmt wraps a single struct-literal argument differently
             # from a two-argument call; emit its preferred shape directly.
             scan_call = "\n".join([
-                "  let findings = @moon_scrub.scan_with_config(",
-                "    input,",
-                "    { ..@moon_scrub.ScanConfig::standard(), detect_high_entropy: true },",
-                "  )",
+                "  let findings = @moon_scrub.scan_with_config(input, {",
+                "    ..@moon_scrub.ScanConfig::standard(),",
+                "    detect_high_entropy: true,",
+                "  })",
             ])
         elif mode == "pattern":
             scan_call = "\n".join([
