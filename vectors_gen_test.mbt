@@ -1168,3 +1168,13 @@ test "vector: slack-rotation-token" {
     "xoxe.x-xcs-123456789012-1234567890123",
   )
 }
+
+///|
+test "vector: ipv6-triple-colon-rejected" {
+  let input = "no 1:::2 here"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 0)
+}

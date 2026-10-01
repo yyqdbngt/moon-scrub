@@ -227,6 +227,10 @@ fn ipv6_run_ok(run : String) -> Bool {
           if compressed {
             return false
           }
+          // A third adjacent colon makes ":::" — never a valid compression.
+          if i + 2 < run.length() && run[i + 2].to_int() == 58 {
+            return false
+          }
           compressed = true
           expect_group = false
           i += 2

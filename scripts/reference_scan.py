@@ -350,7 +350,7 @@ def scan_ipv6(text, out):
     for m in re.finditer(r"[0-9A-Fa-f:]+", text):
         run = m.group(0)
         if "::" in run:
-            if run.count("::") > 1:
+            if run.count("::") > 1 or ":::" in run:
                 continue
             parts = run.split("::")
             left = [g for g in parts[0].split(":") if g]

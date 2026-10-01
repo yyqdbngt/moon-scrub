@@ -798,6 +798,12 @@
           "confidence": "HIGH"
         }
       ]
+    },
+    {
+      "name": "ipv6-triple-colon-rejected",
+      "mode": "config",
+      "input": "no 1:::2 here",
+      "expect": []
     }
   ]
 }
