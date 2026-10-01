@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.5.0 — 2026-10-01
+
+- gitleaks-parity rule batch: PyPI upload tokens (pypi-AgEIcHlwaS5vcmc),
+  GitLab runner (glrt-), Google OAuth refresh (1//), Atlassian (ATATTx),
+  Slack rotation (xoxe.x-xcs-), Mailgun (key-), Netlify (nfp_), joining
+  the table at 39 prefixes; five pinned by vectors.
+- ChunkScanner::summary: the streaming scanner now exposes the same
+  live BatchSummary as the batch pipeline (category counters, finding
+  total, non-empty push count); a differential test pins parity with
+  redact_batch on line input.
+- 0.4.0 families folded into the cross-language vector contract
+  (entropy and pattern modes; the Python reference implements Shannon
+  entropy and shape rules), 76 vectors, all matching.
+- Coverage engineering: branch-level tests for tally arms, truncated
+  PEM footers, leap-day identities, every PatternRule character class,
+  JSON escaping edges, and short-value PreserveLast4; CI reports
+  production uncovered lines on native and fails above 25.
+- Versioning policy documented (VERSIONING.md): SemVer commitment,
+  frozen ScanPolicy, format-stable marker shapes, release checklist.
+
 ## 0.4.0 — 2026-09-30
 
 - PatternRule shape rules: prefix plus a constrained character class
