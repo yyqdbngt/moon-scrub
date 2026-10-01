@@ -66,4 +66,39 @@ fn main {
   for line in corpus() {
     println("R|" + @scrub.redact_with_config(line, config).text)
   }
+  // Third block: whole-line JSON documents (mixed leaves), redacted.
+  for line in corpus() {
+    let doc = "{\"row\": \"" + line + "\", \"note\": \"plain\"}"
+    println("J|" + @scrub.redact_json(doc, config~).text)
+  }
+  // Fourth block: the whole corpus as one stream, chunked at 7 units.
+  let mut stream = ""
+  for line in corpus() {
+    stream += line + "\n"
+  }
+  let scanner = @scrub.ChunkScanner::new(overlap=64)
+  let streamed : Array[@scrub.Finding] = []
+  let mut i = 0
+  while i < stream.length() {
+    let end = if i + 7 < stream.length() { i + 7 } else { stream.length() }
+    for finding in scanner.push(stream[i:end].to_owned()) {
+      streamed.push(finding)
+    }
+    i = end
+  }
+  for finding in scanner.finish() {
+    streamed.push(finding)
+  }
+  for finding in streamed {
+    println(
+      "S|" +
+      finding.kind.to_string() +
+      " " +
+      finding.start.to_string() +
+      " " +
+      finding.end.to_string() +
+      " " +
+      finding.confidence.to_string(),
+    )
+  }
 }

@@ -570,3 +570,102 @@ def explain(text, mode="config"):
         f"{kind} {start}-{end} {conf}"
         for kind, start, end, conf in non_overlapping(scan_all(text, mode))
     ]
+
+
+def redact_json(text, mode="config"):
+    import json as _json
+
+    def walk(value, path):
+        if isinstance(value, str):
+            sensitive = path.rsplit(".", 1)[-1].rsplit("/", 1)[-1].rsplit("[", 1)[-1].rstrip("]") in SENSITIVE_KEYS
+            findings = (
+                [("CREDENTIAL", 0, len(value), "HIGH")]
+                if sensitive and value
+                else non_overlapping(scan_all(value, mode))
+            )
+            if not findings:
+                return value, 0
+            out = value
+            for kind, s, e in [(k, s, e) for k, s, e, _c in findings]:
+                out = out[:s] + f"[REDACTED:{kind}]" + out[e:]
+            return out, len(findings)
+        if isinstance(value, list):
+            items, changed = [], 0
+            for i, item in enumerate(value):
+                new, c = walk(item, f"{path}/{i}")
+                items.append(new)
+                changed += c
+            return items, changed
+        if isinstance(value, dict):
+            obj, changed = {}, 0
+            for key in sorted(value):
+                new, c = walk(value[key], f"{path}/{key}")
+                obj[key] = new
+                changed += c
+            return obj, changed
+        return value, 0
+
+    try:
+        doc = _json.loads(text)
+    except _json.JSONDecodeError:
+        plain, n = redact(text, style="typed", mode=mode)
+        return plain, n, False
+    rebuilt, changed = walk(doc, "")
+    return _json.dumps(rebuilt, ensure_ascii=False, separators=(",", ":")), changed, True
+
+
+# --- Streaming port: the chunked scanner with context margin ------------
+
+CHUNK_CONTEXT_MARGIN = 32
+
+
+class ChunkScanner:
+    """Python port of MoonScrub's ChunkScanner: overlap window, context
+    margin before the first unsettled finding, dedup on retreat."""
+
+    def __init__(self, mode="config", overlap=8192):
+        self.mode = mode
+        self.overlap = max(overlap, 64)
+        self.buffer = ""
+        self.base = 0
+        self.finished = False
+        self.emitted_until = 0
+
+    def push(self, chunk):
+        if self.finished or not chunk:
+            return []
+        self.buffer += chunk
+        window = self.buffer
+        if len(window) <= self.overlap:
+            return []
+        limit = len(window) - self.overlap
+        findings = non_overlapping(scan_all(window, self.mode))
+        settled = []
+        drop = limit
+        for kind, start, end, conf in findings:
+            if end <= limit:
+                abs_start = self.base + start
+                if abs_start >= self.emitted_until:
+                    settled.append((kind, abs_start, self.base + end, conf))
+                    self.emitted_until = self.base + end
+                drop = end
+            else:
+                keep_from = max(0, start - CHUNK_CONTEXT_MARGIN)
+                drop = min(drop, keep_from)
+                break
+        self.base += drop
+        self.buffer = window[drop:]
+        return settled
+
+    def finish(self):
+        if self.finished:
+            return []
+        self.finished = True
+        window = self.buffer
+        out = []
+        for kind, start, end, conf in non_overlapping(scan_all(window, self.mode)):
+            if self.base + start >= self.emitted_until:
+                out.append((kind, self.base + start, self.base + end, conf))
+        self.buffer = ""
+        self.base = 0
+        return out

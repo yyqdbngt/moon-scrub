@@ -68,6 +68,17 @@ def python_side():
             blocks.append("".join(f"{k} {s} {e} {c};" for k, s, e, c in found))
     for line in lines:
         blocks.append("R|" + ref.redact(line, style="typed", mode="config")[0])
+    for line in lines:
+        doc = '{"row": "' + line + '", "note": "plain"}'
+        blocks.append("J|" + ref.redact_json(doc, mode="config")[0])
+    stream = "\n".join(lines) + "\n"
+    scanner = ref.ChunkScanner(mode="config", overlap=64)
+    streamed = []
+    for i in range(0, len(stream), 7):
+        streamed += scanner.push(stream[i:i + 7])
+    streamed += scanner.finish()
+    for kind, s, e, c in streamed:
+        blocks.append(f"S|{kind} {s} {e} {c}")
     return blocks
 
 
