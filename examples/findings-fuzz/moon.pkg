@@ -1,0 +1,7 @@
+import {
+  "123123213weqw/moon_scrub" @scrub,
+  "moonbitlang/core/string",
+  "moonbitlang/core/env",
+}
+
+pkgtype(kind: "executable")

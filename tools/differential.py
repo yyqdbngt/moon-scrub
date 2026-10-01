@@ -71,8 +71,74 @@ def python_side():
     return blocks
 
 
+FUZZ_SECRETS = [
+    "ghp_{}abcdefghij",
+    "password={}",
+    "mail {}@example.com",
+    "ip 10.0.{}.{}",
+    "token=xoxb-{}-1234567890",
+    "bearer {}{}",
+    "id 1101051990010100{}",
+]
+
+
+def fuzz_corpus(seed, lines):
+    """Random mixed lines: filler words with secrets injected at random
+    slots, so line shapes never repeat exactly."""
+    corpus = []
+    state = seed
+    for i in range(lines):
+        state = lcg(state)
+        if state % 4 == 0:
+            w, state = make_word(state, 10)
+            corpus.append("plain " + w + " request")
+            continue
+        slot = state % len(FUZZ_SECRETS)
+        tmpl = FUZZ_SECRETS[slot]
+        parts_needed = tmpl.count("{}")
+        filled = []
+        for _ in range(parts_needed):
+            w, state = make_word(state, 7)
+            filled.append(w)
+        corpus.append(tmpl.format(*filled))
+    return corpus
+
+
+def fuzz_side(seed, lines):
+    blocks = []
+    for line in fuzz_corpus(seed, lines):
+        found = ref.non_overlapping(ref.scan_all(line, "config"))
+        blocks.append(
+            "".join(f"{k} {s} {e} {c};" for k, s, e, c in found) or "-"
+        )
+    return blocks
+
+
 def main():
     target = []
+    if "--fuzz" in sys.argv:
+        i = sys.argv.index("--fuzz")
+        seed = int(sys.argv[i + 1]) if i + 1 < len(sys.argv) else 424242
+        lines = 300
+        # The MoonBit side prints one line per fuzz input from the same
+        # generator; examples/findings-dump --fuzz implements the identical
+        # loop natively.
+        run = subprocess.run(
+            ["moon", "run", "examples/findings-fuzz"] + target
+            + ["--", str(seed), str(lines)],
+            cwd=ROOT, capture_output=True, text=True, check=True,
+        )
+        moonbit_side = run.stdout.strip().split("\n")
+        expected = fuzz_side(seed, lines)
+        if moonbit_side == expected:
+            print(f"fuzz differential OK: {lines} lines, seed {seed}")
+            return 0
+        print("FUZZ MISMATCH")
+        for j, (m, p) in enumerate(zip(moonbit_side, expected)):
+            if m != p:
+                print(f"line {j}: moonbit={m!r} python={p!r}")
+                break
+        return 1
     if "--target" in sys.argv:
         i = sys.argv.index("--target")
         target = ["--target", sys.argv[i + 1]]
