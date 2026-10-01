@@ -83,14 +83,14 @@ def emit(doc) -> str:
     for vector in doc["vectors"]:
         mode = vector["mode"]
         if mode == "entropy":
-            scan_call = call_expr(
-                "  ",
-                "let findings = @moon_scrub.scan_with_config",
-                [
-                    "input",
-                    "{ ..@moon_scrub.ScanConfig::standard(), detect_high_entropy: true }",
-                ],
-            )
+            # moon fmt wraps a single struct-literal argument differently
+            # from a two-argument call; emit its preferred shape directly.
+            scan_call = "\n".join([
+                "  let findings = @moon_scrub.scan_with_config(",
+                "    input,",
+                "    { ..@moon_scrub.ScanConfig::standard(), detect_high_entropy: true },",
+                "  )",
+            ])
         elif mode == "pattern":
             scan_call = "\n".join([
                 "  let findings = @moon_scrub.scan_with_config(input, {",
