@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.5.1 — 2026-10-01
+
+- Fixed: 1:::2 (a triple-colon compression) was reported as IPV6; the
+  parser now rejects any third adjacent colon at the compression
+  marker, on both the MoonBit side and the Python reference, and the
+  case enters the vector contract.
+- Fixed (reference only): string-boundary IPv4 literals were silently
+  suppressed by the Python port — an empty boundary string satisfies
+  any membership test in Python; the same trap existed in resident-id
+  tail checks. String-start and string-end IPv4 vectors pin the
+  behaviour.
+- Library-level differential gate: tools/differential.py and
+  examples/findings-dump compare eighty lines of findings and typed
+  redaction between the two implementations byte for byte on every
+  push; the reference now also implements redaction, verify_clean,
+  findings_summary, and explain, making it a true second
+  implementation rather than a vector oracle.
+- Executable documentation: eleven core entry points carry mbt-check
+  doc examples executed by moon test; docs/cookbook.md adds ten
+  copy-ready recipes.
+- Coverage: the last reachable branches are exercised (April-30
+  identity boundary, truncated certificate footers, batch MAC tallies,
+  JSON backslash/control escapes, prefix-length key ordering,
+  non-ASCII before a prefix); remaining uncovered lines are
+  unreachable defensive returns.
+
 ## 0.5.0 — 2026-10-01
 
 - gitleaks-parity rule batch: PyPI upload tokens (pypi-AgEIcHlwaS5vcmc),
