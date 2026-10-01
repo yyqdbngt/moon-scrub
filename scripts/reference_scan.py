@@ -389,6 +389,10 @@ CONFIG_EXTRA = {"resident", "mac", "uuid", "ipv6", "public", "wallet", "webhook"
 
 
 def families_for(mode):
+    if mode == "entropy":
+        return CREDENTIALS | LEGACY_POLICY_EXTRA | CONFIG_EXTRA | {"entropy"}
+    if mode == "pattern":
+        return CREDENTIALS | {"pattern"}
     if mode == "secrets":
         return CREDENTIALS
     if mode == "standard":
@@ -422,8 +426,63 @@ def scan_all(text, mode):
         scan_certificates(text, out)
     if "wallet" in fam: scan_wallets(text, out)
     if "webhook" in fam: scan_webhooks(text, out)
+    if "entropy" in fam: scan_high_entropy(text, out)
+    if "pattern" in fam: scan_pattern_rules(text, out)
     if "card" in fam: scan_cards(text, out)
     return sorted(out, key=lambda f: (f[1], -f[2]))
+
+
+def shannon_entropy(run):
+    from collections import Counter
+    from math import log2
+    c = Counter(run)
+    n = len(run)
+    return -sum(v / n * log2(v / n) for v in c.values())
+
+
+def is_entropy_char(ch):
+    return ch.isalnum() or ch in "+/=-_"
+
+
+def scan_high_entropy(text, out):
+    import re
+    for m in re.finditer(r"[A-Za-z0-9+/=_-]+", text):
+        run = m.group(0)
+        if len(run) >= 40 and shannon_entropy(run) >= 4.75:
+            push(out, "HIGH_ENTROPY_SECRET", m.start(), m.end(), "MEDIUM")
+
+
+PATTERN_RULES = [
+    ("txn_", "hexlower", 20, 24),
+    ("acct-", "digits", 12, 16),
+]
+
+
+def pattern_class_match(cls, ch):
+    if cls == "hexlower":
+        return ch.isdigit() or "a" <= ch <= "f"
+    if cls == "digits":
+        return ch.isdigit()
+    raise ValueError(cls)
+
+
+def scan_pattern_rules(text, out):
+    for prefix, cls, lo, hi in PATTERN_RULES:
+        i = 0
+        while text.startswith(prefix, i) if i <= len(text) else False:
+            pass
+        i = 0
+        while i + len(prefix) <= len(text):
+            if text.startswith(prefix, i):
+                end = i + len(prefix)
+                while end < len(text) and end - i < hi and pattern_class_match(cls, text[end]):
+                    end += 1
+                tail_ok = end >= len(text) or not pattern_class_match(cls, text[end])
+                if tail_ok and end - i >= lo:
+                    push(out, "ACCESS_TOKEN", i, end, "HIGH")
+                    i = end
+                    continue
+            i += 1
 
 
 def non_overlapping(findings):

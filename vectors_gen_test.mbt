@@ -988,3 +988,93 @@ test "vector: grafana-service-account-token" {
     "glc_eyJabc123defGHI456",
   )
 }
+
+///|
+test "vector: high-entropy-key" {
+  let input = "key ZkSBvrjn9Wvgfygw2wMqZcUDIh7yfJs1ON43xKmTecQoXsf2 done"
+  let findings = @moon_scrub.scan_with_config(input, {
+    ..@moon_scrub.ScanConfig::standard(),
+    detect_high_entropy: true,
+  })
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "HIGH_ENTROPY_SECRET")
+  assert_eq(findings[0].start, 4)
+  assert_eq(findings[0].end, 52)
+  assert_eq(findings[0].confidence, @moon_scrub.Medium)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "ZkSBvrjn9Wvgfygw2wMqZcUDIh7yfJs1ON43xKmTecQoXsf2",
+  )
+}
+
+///|
+test "vector: high-entropy-english-rejected" {
+  let input = "note thequickbrownfoxjumpsoverthelazydogandrunsfarawa end"
+  let findings = @moon_scrub.scan_with_config(input, {
+    ..@moon_scrub.ScanConfig::standard(),
+    detect_high_entropy: true,
+  })
+  assert_eq(findings.length(), 0)
+}
+
+///|
+test "vector: pattern-rule-hexlower-window" {
+  let input = "ref txn_3f9a2c81d07b4e5591 ok"
+  let findings = @moon_scrub.scan_with_config(input, {
+    ..@moon_scrub.ScanConfig::secrets_only(),
+    extra_patterns: [
+      @moon_scrub.PatternRule::{
+        prefix: "txn_",
+        chars: @moon_scrub.HexLower,
+        min_length: 20,
+        max_length: 24,
+      },
+      @moon_scrub.PatternRule::{
+        prefix: "acct-",
+        chars: @moon_scrub.Digits,
+        min_length: 12,
+        max_length: 16,
+      },
+    ],
+  })
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 4)
+  assert_eq(findings[0].end, 26)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "txn_3f9a2c81d07b4e5591",
+  )
+}
+
+///|
+test "vector: pattern-rule-digit-window" {
+  let input = "x acct-12345678a9 tail"
+  let findings = @moon_scrub.scan_with_config(input, {
+    ..@moon_scrub.ScanConfig::secrets_only(),
+    extra_patterns: [
+      @moon_scrub.PatternRule::{
+        prefix: "txn_",
+        chars: @moon_scrub.HexLower,
+        min_length: 20,
+        max_length: 24,
+      },
+      @moon_scrub.PatternRule::{
+        prefix: "acct-",
+        chars: @moon_scrub.Digits,
+        min_length: 12,
+        max_length: 16,
+      },
+    ],
+  })
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 2)
+  assert_eq(findings[0].end, 15)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "acct-12345678",
+  )
+}

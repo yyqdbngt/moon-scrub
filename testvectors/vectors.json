@@ -696,6 +696,48 @@
           "confidence": "HIGH"
         }
       ]
+    },
+    {
+      "name": "high-entropy-key",
+      "mode": "entropy",
+      "input": "key ZkSBvrjn9Wvgfygw2wMqZcUDIh7yfJs1ON43xKmTecQoXsf2 done",
+      "expect": [
+        {
+          "kind": "HIGH_ENTROPY_SECRET",
+          "literal": "ZkSBvrjn9Wvgfygw2wMqZcUDIh7yfJs1ON43xKmTecQoXsf2",
+          "confidence": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "name": "high-entropy-english-rejected",
+      "mode": "entropy",
+      "input": "note thequickbrownfoxjumpsoverthelazydogandrunsfarawa end",
+      "expect": []
+    },
+    {
+      "name": "pattern-rule-hexlower-window",
+      "mode": "pattern",
+      "input": "ref txn_3f9a2c81d07b4e5591 ok",
+      "expect": [
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "txn_3f9a2c81d07b4e5591",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "pattern-rule-digit-window",
+      "mode": "pattern",
+      "input": "x acct-12345678a9 tail",
+      "expect": [
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "acct-12345678",
+          "confidence": "HIGH"
+        }
+      ]
     }
   ]
 }

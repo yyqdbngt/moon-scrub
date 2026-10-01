@@ -82,7 +82,36 @@ def emit(doc) -> str:
     ]
     for vector in doc["vectors"]:
         mode = vector["mode"]
-        if mode == "phone":
+        if mode == "entropy":
+            scan_call = call_expr(
+                "  ",
+                "let findings = @moon_scrub.scan_with_config",
+                [
+                    "input",
+                    "{ ..@moon_scrub.ScanConfig::standard(), detect_high_entropy: true }",
+                ],
+            )
+        elif mode == "pattern":
+            scan_call = "\n".join([
+                "  let findings = @moon_scrub.scan_with_config(input, {",
+                "    ..@moon_scrub.ScanConfig::secrets_only(),",
+                "    extra_patterns: [",
+                "      @moon_scrub.PatternRule::{",
+                "        prefix: \"txn_\",",
+                "        chars: @moon_scrub.HexLower,",
+                "        min_length: 20,",
+                "        max_length: 24,",
+                "      },",
+                "      @moon_scrub.PatternRule::{",
+                "        prefix: \"acct-\",",
+                "        chars: @moon_scrub.Digits,",
+                "        min_length: 12,",
+                "        max_length: 16,",
+                "      },",
+                "    ],",
+                "  })",
+            ])
+        elif mode == "phone":
             # moon fmt wraps a struct-literal argument in its own shape;
             # emit that shape directly so --check and fmt agree.
             scan_call = "\n".join([
