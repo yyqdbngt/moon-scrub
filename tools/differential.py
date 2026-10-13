@@ -79,6 +79,17 @@ def python_side():
     streamed += scanner.finish()
     for kind, s, e, c in streamed:
         blocks.append(f"S|{kind} {s} {e} {c}")
+    # Fifth block: finding diffs and locations, mirroring the MoonBit
+    # dump's mutated-line loop with the same synthetic leak suffix.
+    for line in lines:
+        mutated = line + " leak=sk-ant-synthetic0000000001"
+        before = ref.non_overlapping(ref.scan_all(line, "config"))
+        after = ref.non_overlapping(ref.scan_all(mutated, "config"))
+        diff = ref.diff_findings(before, after)
+        report = ref.format_diff_report(diff)
+        blocks.append("D|" + (",".join(report) if report else "-"))
+        located = ref.locate_findings(mutated, after)
+        blocks.append("L|" + ";".join(ref.format_location(x) for x in located))
     return blocks
 
 

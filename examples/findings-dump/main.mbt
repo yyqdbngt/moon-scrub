@@ -101,4 +101,36 @@ fn main {
       finding.confidence.to_string(),
     )
   }
+  // Fifth block: finding diffs between each original line and a mutated
+  // copy with a synthetic leak appended, plus locations in the mutated
+  // copy. Exercises diff_findings, format_diff_report, locate_findings
+  // and format_location against the Python reference.
+  for line in corpus() {
+    let mutated = line + " leak=sk-ant-synthetic0000000001"
+    let before = @scrub.scan_with_config(line, config)
+    let after = @scrub.scan_with_config(mutated, config)
+    let diff = @scrub.diff_findings(before, after)
+    let report = @scrub.format_diff_report(diff)
+    if report.length() == 0 {
+      println("D|-")
+    } else {
+      let mut parts = ""
+      for k = 0; k < report.length(); k = k + 1 {
+        if k > 0 {
+          parts += ","
+        }
+        parts += report[k]
+      }
+      println("D|" + parts)
+    }
+    let located = @scrub.locate_findings(mutated, after)
+    let mut marks = ""
+    for k = 0; k < located.length(); k = k + 1 {
+      if k > 0 {
+        marks += ";"
+      }
+      marks += @scrub.format_location(located[k])
+    }
+    println("L|" + marks)
+  }
 }

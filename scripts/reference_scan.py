@@ -612,6 +612,70 @@ def redact(text, style="typed", mode="config"):
     return "".join(out), len(findings)
 
 
+def diff_findings(before, after):
+    """Structural diff of two finding lists, mirroring the MoonBit gate.
+
+    Sorted by (start, end, kind string); two-pointer walk; the same
+    secret at a new offset is one removal plus one addition.
+    """
+    def key(f):
+        return (f[1], f[2], f[0])
+
+    left = sorted(before, key=key)
+    right = sorted(after, key=key)
+    added, removed = [], []
+    unchanged = 0
+    i = j = 0
+    while i < len(left) and j < len(right):
+        a, b = left[i], right[j]
+        if key(a) < key(b):
+            removed.append(a)
+            i += 1
+        elif key(a) > key(b):
+            added.append(b)
+            j += 1
+        else:
+            unchanged += 1
+            i += 1
+            j += 1
+    while i < len(left):
+        removed.append(left[i])
+        i += 1
+    while j < len(right):
+        added.append(right[j])
+        j += 1
+    return {"added": added, "removed": removed, "unchanged": unchanged}
+
+
+def format_diff_report(diff):
+    lines = []
+    for kind, start, end, confidence in sorted(diff["added"], key=lambda f: (f[1], f[2], f[0])):
+        lines.append(f"+ {kind} @ {start}-{end} {confidence}")
+    for kind, start, end, confidence in sorted(diff["removed"], key=lambda f: (f[1], f[2], f[0])):
+        lines.append(f"- {kind} @ {start}-{end} {confidence}")
+    return lines
+
+
+def locate_findings(text, findings):
+    """Offset to 1-based line/column, start order, mirroring the MoonBit map."""
+    line_starts = [0]
+    for i, ch in enumerate(text):
+        if ch == "\n":
+            line_starts.append(i + 1)
+    ordered = sorted(findings, key=lambda f: f[1])
+    located = []
+    cursor = 0
+    for kind, start, end, confidence in ordered:
+        while cursor + 1 < len(line_starts) and line_starts[cursor + 1] <= start:
+            cursor += 1
+        located.append((kind, start, end, confidence, cursor + 1, start - line_starts[cursor] + 1))
+    return located
+
+
+def format_location(located):
+    kind, _start, _end, confidence, line, column = located
+    return f"line {line}, col {column}: {kind} ({confidence})"
+
 def verify_clean(text, mode="config"):
     return len(non_overlapping(scan_all(text, mode))) == 0
 
