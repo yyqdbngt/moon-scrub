@@ -80,3 +80,18 @@ let config = {
 ## 幂等性承诺
 
 三种脱敏样式重复应用结果不变（marker 感知），详见[安全模型](security-model.md)。
+
+## 11. CI 出口门:这次改动有没有引入新秘密
+
+```moonbit
+let before = scan_with_config(baseline_text, ScanConfig::standard())
+let after  = scan_with_config(candidate_text, ScanConfig::standard())
+let diff   = diff_findings(before, after)
+if diff.added.length() > 0 {
+  // format_diff_report(diff) 每行 "+ KIND @ start-end CONFIDENCE",
+  // 直接贴到 CI 注释里
+  abort("refuse to merge: new findings")
+}
+```
+
+位置敏感是故意的:同一个秘密换了偏移也算一删一加——隐藏移动的门也会隐藏风险。
