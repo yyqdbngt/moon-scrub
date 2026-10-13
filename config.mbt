@@ -72,6 +72,7 @@ pub(all) struct ScanConfig {
   detect_ipv6 : Bool
   detect_uuid : Bool
   detect_mac : Bool
+  detect_iban : Bool
   suppress_version_ipv4 : Bool
   require_known_card_prefix : Bool
   /// Drop email findings on IANA-reserved documentation domains
@@ -110,6 +111,7 @@ pub fn ScanConfig::standard() -> ScanConfig {
     detect_ipv6: true,
     detect_uuid: true,
     detect_mac: true,
+    detect_iban: true,
     suppress_version_ipv4: true,
     require_known_card_prefix: true,
     suppress_example_domains: false,
@@ -136,6 +138,7 @@ pub fn ScanConfig::secrets_only() -> ScanConfig {
     detect_ipv6: false,
     detect_uuid: false,
     detect_mac: false,
+    detect_iban: false,
   }
 }
 

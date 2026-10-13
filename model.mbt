@@ -21,6 +21,7 @@ pub(all) enum SensitiveKind {
   WalletAddress
   WebhookUrl
   HighEntropySecret
+  Iban
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -51,6 +52,7 @@ pub fn SensitiveKind::to_string(self : SensitiveKind) -> String {
     Ipv6 => "IPV6"
     Uuid => "UUID"
     MacAddress => "MAC_ADDRESS"
+    Iban => "IBAN"
   }
 }
 
@@ -165,6 +167,7 @@ pub(all) struct BatchSummary {
   mut wallet_addresses : Int
   mut webhook_urls : Int
   mut high_entropy_secrets : Int
+  mut ibans : Int
 } derive(Eq, @debug.Debug)
 
 ///|

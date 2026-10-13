@@ -150,6 +150,9 @@ fn run_detectors(
   if config.detect_payment_card {
     scan_cards(text, config.require_known_card_prefix, out)
   }
+  if config.detect_iban {
+    scan_ibans(text, out)
+  }
 }
 
 ///|

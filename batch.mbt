@@ -23,6 +23,7 @@ fn empty_summary(lines : Int) -> BatchSummary {
     wallet_addresses: 0,
     webhook_urls: 0,
     high_entropy_secrets: 0,
+    ibans: 0,
   }
 }
 
@@ -50,6 +51,7 @@ fn tally(summary : BatchSummary, findings : Array[Finding]) -> Unit {
       PublicKey => summary.public_keys += 1
       WalletAddress => summary.wallet_addresses += 1
       WebhookUrl => summary.webhook_urls += 1
+      Iban => summary.ibans += 1
     }
   }
 }
