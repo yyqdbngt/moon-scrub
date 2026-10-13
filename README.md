@@ -11,6 +11,12 @@
   Doppler dop_v1_/dop_v2_、npm npm_ 等）、Bearer token、JWT 和
   password/token/secret/api_key 等赋值。
 - 识别邮箱、IPv4，以及通过 Luhn 校验且命中主流卡组织 BIN 前缀的 13–19 位支付卡号。
+- 识别 IBAN：38 国长度表 + ISO 7064 MOD-97-10 校验，校验不过的单号（发票号、
+  订单号）永不误报；本版本只识别连续大写形态，带空格的印刷形态明确不支持。
+- `diff_findings` + `format_diff_report`：两次扫描的结构化对比（added/removed/
+  unchanged），位置敏感是设计立场——隐藏移动的门也会隐藏风险，可作 CI 出口门。
+- `locate_findings` + `format_location`：UTF-16 偏移到 1 起始行列号的线性映射，
+  面向编辑器与 CI 注释；跨行 finding（私钥块）报告起始位置。
 - `secrets_only` 与 `standard` 两种策略，以及按检测家族逐一开关的 `ScanConfig`。
 - 调用方可注册令牌前缀规则（`TokenPrefixRule`）、字符类+长度窗口的形态规则
   （`PatternRule`）与精确秘密规则（`CustomRule`），规则值和标签不会进入

@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.6.0 — 2026-10-13
+
+- New detector family: IBAN with ISO 7064 MOD-97-10 checksum validation
+  and a 38-country length table. The checksum is the precision gate —
+  invoice and order numbers of the same shape never match. Contiguous
+  uppercase form only; the space-grouped printing form is documented as
+  out of scope. `detect_iban` joins ScanConfig (on in standard and
+  pii_only, off in secrets_only and the legacy ScanPolicy surface), and
+  the batch summary counts IBANs.
+- The IBAN family enters the cross-language contract: five config-mode
+  vectors and a full Python reference implementation (same run
+  boundaries, length table and checksum); the reference passes 86/86
+  and the four-domain differential stays line-identical.
+- New API: `diff_findings` and `format_diff_report` — structural
+  comparison of two scans for CI leak gates, order-independent by
+  construction, position-sensitive by design.
+- New API: `locate_findings` and `format_location` — linear offset to
+  line/column mapping for editor and CI annotations.
+- 227 white-box tests across four backends; 86 cross-language vectors.
+
 ## 0.5.2 — 2026-10-01
 
 - New prefixes: LTAI (Alibaba Cloud AccessKey IDs — the first
