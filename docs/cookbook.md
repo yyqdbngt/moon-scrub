@@ -95,3 +95,12 @@ if diff.added.length() > 0 {
 ```
 
 位置敏感是故意的:同一个秘密换了偏移也算一删一加——隐藏移动的门也会隐藏风险。
+
+## 12. k=v 日志行:引号内整体脱敏
+
+```moonbit
+let safe = redact_kv(line, ScanConfig::standard())
+// msg="token [REDACTED:ACCESS_TOKEN] inside" user=7
+// 引号内的多个 finding 折叠为一个整体标记,键与结构原样保留;
+// 无命中的行逐字节原样返回
+```
