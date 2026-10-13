@@ -38,6 +38,8 @@ pub fn redact_full(String, Array[CustomRule], ScanConfig, style? : RedactionStyl
 
 pub fn redact_json(String, config? : ScanConfig, style? : RedactionStyle) -> JsonRedactionResult
 
+pub fn redact_json_lines(String, config? : ScanConfig, style? : RedactionStyle) -> JsonLinesResult
+
 pub fn redact_json_with_rules(String, Array[CustomRule], config? : ScanConfig, style? : RedactionStyle) -> JsonRedactionResult
 
 pub fn redact_kv(String, ScanConfig, style? : RedactionStyle) -> String
@@ -199,6 +201,17 @@ pub fn JsonFinding::equal(Self, Self) -> Bool
 pub fn JsonFinding::not_equal(Self, Self) -> Bool
 pub fn JsonFinding::to_repr(Self) -> @debug.Repr
 
+pub(all) struct JsonLinesResult {
+  lines : Array[String]
+  changed_indices : Array[Int]
+  findings : Int
+  unparsed : Int
+  text : String
+} derive(Eq, @debug.Debug)
+pub fn JsonLinesResult::equal(Self, Self) -> Bool
+pub fn JsonLinesResult::not_equal(Self, Self) -> Bool
+pub fn JsonLinesResult::to_repr(Self) -> @debug.Repr
+
 pub(all) struct JsonRedactionResult {
   text : String
   changed_fields : Int
@@ -273,6 +286,7 @@ pub(all) struct ScanConfig {
   extra_patterns : Array[PatternRule]
 } derive(Eq, @debug.Debug)
 pub fn ScanConfig::equal(Self, Self) -> Bool
+pub fn ScanConfig::financial_only() -> Self
 pub fn ScanConfig::not_equal(Self, Self) -> Bool
 pub fn ScanConfig::pii_only() -> Self
 pub fn ScanConfig::secrets_only() -> Self

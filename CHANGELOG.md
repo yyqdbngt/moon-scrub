@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.8.0 — 2026-10-13
+
+- `redact_json_lines`: NDJSON adapter with per-line isolation —
+  malformed lines fall back to plain scanning without touching
+  neighbours; a parsed line with zero findings echoes byte-identical,
+  so the canonical compact form is imposed only where something
+  changed. changed_indices routes exactly the affected rows.
+- `ScanConfig::financial_only()` preset: payment cards, IBANs and
+  wallet addresses only.
+- The differential gate grows to seven API domains and 317 compared
+  lines; the Python reference mirrors redact_json_lines exactly.
+
 ## 0.7.0 — 2026-10-13
 
 - `redact_kv`: key-value log adapter with quote-aware value scanning —
