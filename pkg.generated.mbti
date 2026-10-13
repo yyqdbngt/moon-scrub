@@ -6,11 +6,21 @@ import {
 }
 
 // Values
+pub fn diff_findings(Array[Finding], Array[Finding]) -> FindingsDiff
+
+pub fn entropy_report(String, ScanConfig) -> EntropySummary
+
 pub fn explain(String, config? : ScanConfig) -> Array[String]
 
 pub fn explain_json(String, config? : ScanConfig) -> String
 
 pub fn findings_summary(String, config? : ScanConfig) -> Array[KindCount]
+
+pub fn format_diff_report(FindingsDiff) -> Array[String]
+
+pub fn format_location(FindingLocation) -> String
+
+pub fn locate_findings(String, Array[Finding]) -> Array[FindingLocation]
 
 pub fn redact(String, style? : RedactionStyle, policy? : ScanPolicy) -> RedactionResult
 
@@ -29,6 +39,8 @@ pub fn redact_full(String, Array[CustomRule], ScanConfig, style? : RedactionStyl
 pub fn redact_json(String, config? : ScanConfig, style? : RedactionStyle) -> JsonRedactionResult
 
 pub fn redact_json_with_rules(String, Array[CustomRule], config? : ScanConfig, style? : RedactionStyle) -> JsonRedactionResult
+
+pub fn redact_kv(String, ScanConfig, style? : RedactionStyle) -> String
 
 pub fn redact_with_config(String, ScanConfig, style? : RedactionStyle) -> RedactionResult
 
@@ -85,6 +97,7 @@ pub(all) struct BatchSummary {
   mut wallet_addresses : Int
   mut webhook_urls : Int
   mut high_entropy_secrets : Int
+  mut ibans : Int
 } derive(Eq, @debug.Debug)
 pub fn BatchSummary::equal(Self, Self) -> Bool
 pub fn BatchSummary::not_equal(Self, Self) -> Bool
@@ -125,6 +138,22 @@ pub fn CustomRule::equal(Self, Self) -> Bool
 pub fn CustomRule::not_equal(Self, Self) -> Bool
 pub fn CustomRule::to_repr(Self) -> @debug.Repr
 
+pub(all) struct EntropySummary {
+  entries : Array[FindingEntropy]
+  finding_count : Int
+  very_high : Int
+  high : Int
+  medium : Int
+  low : Int
+  sensitive_chars : Int
+  text_units : Int
+} derive(Eq, @debug.Debug)
+pub fn EntropySummary::density_per_kilo(Self) -> Double
+pub fn EntropySummary::equal(Self, Self) -> Bool
+pub fn EntropySummary::needs_review(Self) -> Bool
+pub fn EntropySummary::not_equal(Self, Self) -> Bool
+pub fn EntropySummary::to_repr(Self) -> @debug.Repr
+
 pub(all) struct Finding {
   kind : SensitiveKind
   start : Int
@@ -134,6 +163,33 @@ pub(all) struct Finding {
 pub fn Finding::equal(Self, Self) -> Bool
 pub fn Finding::not_equal(Self, Self) -> Bool
 pub fn Finding::to_repr(Self) -> @debug.Repr
+
+pub(all) struct FindingEntropy {
+  finding : Finding
+  entropy : Double
+  band : String
+} derive(Eq, @debug.Debug)
+pub fn FindingEntropy::equal(Self, Self) -> Bool
+pub fn FindingEntropy::not_equal(Self, Self) -> Bool
+pub fn FindingEntropy::to_repr(Self) -> @debug.Repr
+
+pub(all) struct FindingLocation {
+  finding : Finding
+  line : Int
+  column : Int
+} derive(Eq, @debug.Debug)
+pub fn FindingLocation::equal(Self, Self) -> Bool
+pub fn FindingLocation::not_equal(Self, Self) -> Bool
+pub fn FindingLocation::to_repr(Self) -> @debug.Repr
+
+pub(all) struct FindingsDiff {
+  added : Array[Finding]
+  removed : Array[Finding]
+  unchanged : Int
+} derive(Eq, @debug.Debug)
+pub fn FindingsDiff::equal(Self, Self) -> Bool
+pub fn FindingsDiff::not_equal(Self, Self) -> Bool
+pub fn FindingsDiff::to_repr(Self) -> @debug.Repr
 
 pub(all) struct JsonFinding {
   path : String
@@ -209,6 +265,7 @@ pub(all) struct ScanConfig {
   detect_ipv6 : Bool
   detect_uuid : Bool
   detect_mac : Bool
+  detect_iban : Bool
   suppress_version_ipv4 : Bool
   require_known_card_prefix : Bool
   suppress_example_domains : Bool
@@ -253,6 +310,7 @@ pub(all) enum SensitiveKind {
   WalletAddress
   WebhookUrl
   HighEntropySecret
+  Iban
 } derive(Eq, @debug.Debug)
 pub fn SensitiveKind::equal(Self, Self) -> Bool
 pub fn SensitiveKind::not_equal(Self, Self) -> Bool

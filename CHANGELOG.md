@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.7.0 — 2026-10-13
+
+- `redact_kv`: key-value log adapter with quote-aware value scanning —
+  double quotes with escapes, single quotes, unterminated to end of
+  line. Findings inside quotes are replaced in place, keeping the
+  surrounding prose; clean lines pass through byte-identical.
+- `entropy_report`: per-finding Shannon entropy bands (low/medium/
+  high/very-high at 3/4/4.75 bits per character), density per kilo
+  unit, and a needs_review flag. Deterministic statistics.
+- The differential gate grows to six API domains and 315 compared
+  lines; aligning the kv domain caught a real divergence (whole-quote
+  collapse vs in-place replacement) that is now pinned to in-place.
+- Python reference mirrors diff_findings, format_diff_report,
+  locate_findings, format_location and redact_kv.
+
 ## 0.6.1 — 2026-10-13
 
 - Batch three of documented token prefixes: Slack xapp-/xoxs-, Discord
