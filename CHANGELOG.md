@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.9.0 — 2026-10-13
+
+- `explain_suppressed`: suppression transparency. The pass reruns
+  detection with every suppressor disabled, subtracts the kept scan
+  through diff_findings, and attributes each removed candidate to its
+  rule. A silent filter is an unauditable filter; reports can now
+  distinguish "clean" from "suppressed". Offsets only, as always.
+- The differential gate grows to eight API domains and 320 compared
+  lines; aligning the domain caught a diff-direction bug in the
+  Python mirror (relaxed minus kept, not the reverse).
+
 ## 0.8.0 — 2026-10-13
 
 - `redact_json_lines`: NDJSON adapter with per-line isolation —

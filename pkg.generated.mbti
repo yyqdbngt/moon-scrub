@@ -14,6 +14,8 @@ pub fn explain(String, config? : ScanConfig) -> Array[String]
 
 pub fn explain_json(String, config? : ScanConfig) -> String
 
+pub fn explain_suppressed(String, ScanConfig) -> Array[SuppressedFinding]
+
 pub fn findings_summary(String, config? : ScanConfig) -> Array[KindCount]
 
 pub fn format_diff_report(FindingsDiff) -> Array[String]
@@ -358,6 +360,16 @@ pub(all) struct StructuredResult {
 pub fn StructuredResult::equal(Self, Self) -> Bool
 pub fn StructuredResult::not_equal(Self, Self) -> Bool
 pub fn StructuredResult::to_repr(Self) -> @debug.Repr
+
+pub(all) struct SuppressedFinding {
+  kind : SensitiveKind
+  start : Int
+  end : Int
+  reason : String
+} derive(Eq, @debug.Debug)
+pub fn SuppressedFinding::equal(Self, Self) -> Bool
+pub fn SuppressedFinding::not_equal(Self, Self) -> Bool
+pub fn SuppressedFinding::to_repr(Self) -> @debug.Repr
 
 pub(all) struct TokenPrefixRule {
   prefix : String
