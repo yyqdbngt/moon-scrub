@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.1 — 2026-10-13
+
+- Batch three of documented token prefixes: Slack xapp-/xoxs-, Discord
+  bot ids (MTIz/MTE, 55-unit floor), Hugging Face hf_, Replicate r8_,
+  Square sq0atp-/sq0csp-/EAAA, Notion ntn_/secret_, Supabase sbp_.
+  Prefix-less services (Cloudflare, Datadog, Vercel) stay in caller
+  PatternRule config by design. Ten secrets-mode vectors; the Python
+  reference mirrors the specs and passes 96/96.
+
 ## 0.6.0 — 2026-10-13
 
 - New detector family: IBAN with ISO 7064 MOD-97-10 checksum validation

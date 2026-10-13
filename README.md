@@ -8,7 +8,9 @@
 - 识别常见访问令牌前缀（GitHub ghp_/gho_/ghu_/ghs_/ghr_/gha_/github_pat_、GitLab
   glpat-、Slack xoxb-/xoxp-/xoxc-/xoxa-/xoxr-、AWS AKIA/ASIA、Google AIza、Stripe
   sk_live_/rk_live_/pk_live_、Anthropic sk-ant-、OpenAI 风格 sk-、SendGrid SG.、
-  Doppler dop_v1_/dop_v2_、npm npm_ 等）、Bearer token、JWT 和
+  Doppler dop_v1_/dop_v2_、npm npm_、Slack xapp-/xoxs-、Discord 机器人
+  MTIz/MTE、Hugging Face hf_、Replicate r8_、Square sq0atp-/sq0csp-/EAAA、
+  Notion ntn_/secret_、Supabase sbp_ 等）、Bearer token、JWT 和
   password/token/secret/api_key 等赋值。
 - 识别邮箱、IPv4，以及通过 Luhn 校验且命中主流卡组织 BIN 前缀的 13–19 位支付卡号。
 - 识别 IBAN：38 国长度表 + ISO 7064 MOD-97-10 校验，校验不过的单号（发票号、
@@ -30,7 +32,7 @@
   确定的紧凑 JSON；非法输入回退为纯文本扫描。
 - 流式分块扫描：`ChunkScanner` 按块喂入，findings 带全流绝对偏移，跨块秘密依赖
   overlap 窗口保证不漏。
-- 跨语言测试向量：`testvectors/vectors.json` 是行为规范源，任何语言移植都断言同一组
+- 跨语言测试向量（96 个）：`testvectors/vectors.json` 是行为规范源，任何语言移植都断言同一组
   kind/start/end/confidence。
 - 性能基准：确定性语料的吞吐与单行成本报告，以及防二次方退化的线性守门。
 - 脱敏结果可重复处理；`verify_clean` 可执行二次扫描。
