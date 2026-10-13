@@ -18,3 +18,17 @@ test "pii_only still reports resident ids and mac addresses" {
   assert_eq(findings[0].kind, @moon_scrub.ResidentId)
   assert_eq(findings[1].kind, @moon_scrub.MacAddress)
 }
+
+
+///|
+test "financial_only keeps cards ibans wallets only" {
+  let config = @moon_scrub.ScanConfig::financial_only()
+  let findings = @moon_scrub.scan_with_config(
+    "card 4111111111111111 iban DE89370400440532013000 wallet bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq mail a@b.co",
+    config,
+  )
+  assert_eq(findings.length(), 3)
+  assert_eq(findings[0].kind, @moon_scrub.PaymentCard)
+  assert_eq(findings[1].kind, @moon_scrub.Iban)
+  assert_eq(findings[2].kind, @moon_scrub.WalletAddress)
+}

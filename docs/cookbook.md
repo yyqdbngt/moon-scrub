@@ -104,3 +104,12 @@ let safe = redact_kv(line, ScanConfig::standard())
 // 引号内的多个 finding 折叠为一个整体标记,键与结构原样保留;
 // 无命中的行逐字节原样返回
 ```
+
+## 13. NDJSON 管道:逐行隔离、干净行原样
+
+```moonbit
+let result = redact_json_lines(ndjson_text)
+// result.lines        行数、顺序不变
+// result.changed_indices  只有实际变化的行号,便于只投递变更行
+// 解析成功且无命中的行逐字节原样返回;坏行回退纯文本扫描,不波及邻居
+```

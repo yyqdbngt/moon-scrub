@@ -160,6 +160,20 @@ pub fn ScanConfig::pii_only() -> ScanConfig {
 }
 
 ///|
+/// Only the money-moving families run: payment cards, IBANs and wallet
+/// addresses. Identity and credential detectors stay off, so invoices,
+/// ledgers and payment exports can be scrubbed without redacting staff
+/// emails on the same rows.
+pub fn ScanConfig::financial_only() -> ScanConfig {
+  {
+    ..ScanConfig::secrets_only(),
+    detect_payment_card: true,
+    detect_iban: true,
+    detect_wallet: true,
+  }
+}
+
+///|
 /// Bridge the small `ScanPolicy` surface onto the full configuration so older
 /// call sites keep their semantics, including the new suppressors.
 fn ScanPolicy::to_config(self : ScanPolicy) -> ScanConfig {
