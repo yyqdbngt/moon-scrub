@@ -912,6 +912,126 @@
           "confidence": "HIGH"
         }
       ]
+    },
+    {
+      "name": "slack-app-token",
+      "mode": "secrets",
+      "input": "hook xapp-11223344556677889900 ok",
+      "expect": [
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "xapp-11223344556677889900",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "slack-session-token",
+      "mode": "secrets",
+      "input": "xoxs-2233445566778899001122 end",
+      "expect": [
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "xoxs-2233445566778899001122",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "discord-bot-token",
+      "mode": "secrets",
+      "input": "bot MTIzNDU2Nzg5MDEyMzQ1Njc4OTAMDEyMzQ1Njc4OTAxMjM0NTY3ODkw live",
+      "expect": [
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAMDEyMzQ1Njc4OTAxMjM0NTY3ODkw",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "huggingface-token",
+      "mode": "secrets",
+      "input": "hf_abcdefghijklmnopqrst",
+      "expect": [
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "hf_abcdefghijklmnopqrst",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "replicate-token",
+      "mode": "secrets",
+      "input": "r8_abcdefghijklmnopqrstuvwxyz",
+      "expect": [
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "r8_abcdefghijklmnopqrstuvwxyz",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "square-oauth",
+      "mode": "secrets",
+      "input": "sq0atp-abcdefghijklmnopqrst",
+      "expect": [
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "sq0atp-abcdefghijklmnopqrst",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "square-server-key",
+      "mode": "secrets",
+      "input": "key EAAAKmnopqrstuvwxyzabcdefghijkl rotate",
+      "expect": [
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "EAAAKmnopqrstuvwxyzabcdefghijkl",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "notion-integration",
+      "mode": "secrets",
+      "input": "ntn_1234567890abcdefghijklmnop",
+      "expect": [
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "ntn_1234567890abcdefghijklmnop",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "notion-internal",
+      "mode": "secrets",
+      "input": "secret_1234567890abcdefghijklmnop",
+      "expect": [
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "secret_1234567890abcdefghijklmnop",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "supabase-pat",
+      "mode": "secrets",
+      "input": "sbp_1234567890abcdefghijklmnopqrstuvwxyz345678",
+      "expect": [
+        {
+          "kind": "ACCESS_TOKEN",
+          "literal": "sbp_1234567890abcdefghijklmnopqrstuvwxyz345678",
+          "confidence": "HIGH"
+        }
+      ]
     }
   ]
 }

@@ -46,6 +46,20 @@ fn builtin_token_specs() -> Array[TokenPrefixRule] {
     { prefix: "ASIA", min_length: 20, },
     { prefix: "SG.", min_length: 20, },
     { prefix: "sk-", min_length: 11, },
+    // Batch three: documented prefixes only — every entry tracks a real
+    // published token shape; speculative shapes stay in caller config.
+    { prefix: "xapp-", min_length: 15, },        // Slack app-level tokens
+    { prefix: "xoxs-", min_length: 15, },        // Slack session tokens
+    { prefix: "MTIz", min_length: 55, },         // Discord bot (base64 id 123…)
+    { prefix: "MTE", min_length: 55, },          // Discord bot (base64 id 11…)
+    { prefix: "hf_", min_length: 20, },          // Hugging Face
+    { prefix: "r8_", min_length: 20, },          // Replicate
+    { prefix: "sq0atp-", min_length: 20, },      // Square OAuth access
+    { prefix: "sq0csp-", min_length: 20, },      // Square OAuth secret
+    { prefix: "EAAA", min_length: 30, },         // Square server API keys
+    { prefix: "ntn_", min_length: 20, },         // Notion integrations
+    { prefix: "secret_", min_length: 20, },      // Notion internal integrations
+    { prefix: "sbp_", min_length: 40, },         // Supabase personal access
   ]
 }
 

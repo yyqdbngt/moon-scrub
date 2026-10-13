@@ -1334,3 +1334,183 @@ test "vector: iban-spanish" {
     "ES9121000418450200051332",
   )
 }
+
+///|
+test "vector: slack-app-token" {
+  let input = "hook xapp-11223344556677889900 ok"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 5)
+  assert_eq(findings[0].end, 30)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "xapp-11223344556677889900",
+  )
+}
+
+///|
+test "vector: slack-session-token" {
+  let input = "xoxs-2233445566778899001122 end"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 0)
+  assert_eq(findings[0].end, 27)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "xoxs-2233445566778899001122",
+  )
+}
+
+///|
+test "vector: discord-bot-token" {
+  let input = "bot MTIzNDU2Nzg5MDEyMzQ1Njc4OTAMDEyMzQ1Njc4OTAxMjM0NTY3ODkw live"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 4)
+  assert_eq(findings[0].end, 59)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAMDEyMzQ1Njc4OTAxMjM0NTY3ODkw",
+  )
+}
+
+///|
+test "vector: huggingface-token" {
+  let input = "hf_abcdefghijklmnopqrst"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 0)
+  assert_eq(findings[0].end, 23)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "hf_abcdefghijklmnopqrst",
+  )
+}
+
+///|
+test "vector: replicate-token" {
+  let input = "r8_abcdefghijklmnopqrstuvwxyz"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 0)
+  assert_eq(findings[0].end, 29)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "r8_abcdefghijklmnopqrstuvwxyz",
+  )
+}
+
+///|
+test "vector: square-oauth" {
+  let input = "sq0atp-abcdefghijklmnopqrst"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 0)
+  assert_eq(findings[0].end, 27)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "sq0atp-abcdefghijklmnopqrst",
+  )
+}
+
+///|
+test "vector: square-server-key" {
+  let input = "key EAAAKmnopqrstuvwxyzabcdefghijkl rotate"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 4)
+  assert_eq(findings[0].end, 35)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "EAAAKmnopqrstuvwxyzabcdefghijkl",
+  )
+}
+
+///|
+test "vector: notion-integration" {
+  let input = "ntn_1234567890abcdefghijklmnop"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 0)
+  assert_eq(findings[0].end, 30)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "ntn_1234567890abcdefghijklmnop",
+  )
+}
+
+///|
+test "vector: notion-internal" {
+  let input = "secret_1234567890abcdefghijklmnop"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 0)
+  assert_eq(findings[0].end, 33)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "secret_1234567890abcdefghijklmnop",
+  )
+}
+
+///|
+test "vector: supabase-pat" {
+  let input = "sbp_1234567890abcdefghijklmnopqrstuvwxyz345678"
+  let findings = @moon_scrub.scan(
+    input,
+    policy=@moon_scrub.ScanPolicy::secrets_only(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "ACCESS_TOKEN")
+  assert_eq(findings[0].start, 0)
+  assert_eq(findings[0].end, 46)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "sbp_1234567890abcdefghijklmnopqrstuvwxyz345678",
+  )
+}
