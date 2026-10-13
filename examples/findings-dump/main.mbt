@@ -140,4 +140,36 @@ fn main {
     let kv = "msg=\"" + line + "\" level=info"
     println("Q|" + @scrub.redact_kv(kv, config))
   }
+  // Seventh block: NDJSON pipeline over the corpus with a malformed
+  // line injected, exercising isolation and clean-line echo.
+  let nd = StringBuilder()
+  for k = 0; k < corpus().length(); k = k + 1 {
+    let line = corpus()[k]
+    nd.write_string("{\"row\": \"")
+    nd.write_string(line)
+    nd.write_string("\"}\n")
+    if k == 10 {
+      nd.write_string("{\"broken\": \n")
+    }
+  }
+  let lines_result = @scrub.redact_json_lines(nd.to_string())
+  let mut flat = ""
+  for k = 0; k < lines_result.lines.length(); k = k + 1 {
+    if k > 0 {
+      flat += "\\n"
+    }
+    flat += lines_result.lines[k]
+  }
+  // the input ends with a newline, so the rebuilt text does too; the
+  // flattening represents that terminator literally, like the reference
+  flat += "\\n"
+  println("N|" + flat)
+  let mut changed_flat = ""
+  for k = 0; k < lines_result.changed_indices.length(); k = k + 1 {
+    if k > 0 {
+      changed_flat += ","
+    }
+    changed_flat += lines_result.changed_indices[k].to_string()
+  }
+  println("C|" + changed_flat)
 }

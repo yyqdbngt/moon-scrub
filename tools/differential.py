@@ -96,6 +96,17 @@ def python_side():
         blocks.append("K|" + ref.redact_kv(line, mode="config")[0])
         kv = 'msg="' + line + '" level=info'
         blocks.append("Q|" + ref.redact_kv(kv, mode="config")[0])
+    # Seventh block: NDJSON pipeline over the corpus with a malformed
+    # line injected, exercising isolation and clean-line echo.
+    docs = []
+    for k, line in enumerate(lines):
+        docs.append('{"row": ' + __import__("json").dumps(line) + '}')
+        if k == 10:
+            docs.append('{"broken": ')
+    nd = "\n".join(docs) + "\n"
+    rebuilt, changed = ref.redact_json_lines(nd, mode="config")
+    blocks.append("N|" + rebuilt.replace("\n", "\\n"))
+    blocks.append("C|" + ",".join(str(k) for k in changed))
     return blocks
 
 

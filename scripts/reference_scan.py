@@ -740,6 +740,29 @@ def redact_kv(text, mode="config"):
     out.append(tail)
     return "".join(out), {}
 
+def redact_json_lines(text, mode="config"):
+    """NDJSON adapter mirroring the MoonBit line loop: per-line
+    isolation, clean parsed lines echo byte-identical, malformed lines
+    fall back to plain scanning. Returns (text, changed_indices)."""
+    has_final = text.endswith("\n")
+    raw = text.split("\n")
+    if has_final:
+        raw = raw[:-1]
+    out = []
+    changed = []
+    for index, line in enumerate(raw):
+        red, changed_fields, parsed = redact_json(line, mode=mode)
+        if parsed and changed_fields == 0:
+            out.append(line)
+            continue
+        out.append(red)
+        if red != line:
+            changed.append(index)
+    rebuilt = "\n".join(out)
+    if has_final:
+        rebuilt += "\n"
+    return rebuilt, changed
+
 def verify_clean(text, mode="config"):
     return len(non_overlapping(scan_all(text, mode))) == 0
 
