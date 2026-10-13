@@ -763,6 +763,65 @@ def redact_json_lines(text, mode="config"):
         rebuilt += "\n"
     return rebuilt, changed
 
+def _ipv4_version_shaped(text, start, end):
+    """True when the IPv4 literal is glued to word characters on the
+    left (v1.2.3.4 style), mirroring the MoonBit suppressor."""
+    before = text[start - 1] if start > 0 else ""
+    return before.isalnum()
+
+
+def explain_suppressed(text, mode="config"):
+    """Mirror of the MoonBit suppression transparency.
+
+    The reference scanner bakes its suppressors into scan_all, so the
+    relaxed view re-runs family scans with the suppression conditions
+    disabled: IPv4 without the version-shape test, cards without the
+    known-BIN test. The diff against the kept scan attributes each
+    removed candidate to its rule.
+    """
+    import re as _re
+
+    raw = non_overlapping(scan_all(text, mode))
+
+    # relaxed ipv4: rescan without the word-glue test
+    relaxed = list(raw)
+    for m in _re.finditer(r"\d[\d.]*", text):
+        run = m.group(0)
+        valid = ipv4_run_end(run)
+        if valid >= 0:
+            start, end = m.start(), m.start() + valid
+            candidate = ("IPV4", start, end, "MEDIUM")
+            if candidate not in relaxed:
+                relaxed.append(candidate)
+    # relaxed cards: digits runs that pass luhn but fail known_bin
+    for m in _re.finditer(r"\d+", text):
+        digits = [int(c) for c in m.group(0)]
+        if len(digits) >= 13 and luhn_ok(digits) and not known_bin(digits):
+            candidate = ("PAYMENT_CARD", m.start(), m.end(), "HIGH")
+            if candidate not in relaxed:
+                relaxed.append(candidate)
+
+    # raw (the production scan) applied suppression; relaxed did not.
+    # Candidates present in relaxed but missing from raw were suppressed.
+    kept = raw
+    suppressed = []
+    for kind, start, end, confidence in sorted(relaxed, key=lambda f: (f[1], f[2], f[0])):
+        if (kind, start, end, confidence) in kept:
+            continue
+        if kind == "IPV4":
+            reason = "version-shaped IPv4 (suppress_version_ipv4)"
+        elif kind == "PAYMENT_CARD":
+            reason = ("Luhn-valid number outside known card networks "
+                      "(require_known_card_prefix)")
+        elif kind == "EMAIL":
+            reason = ("IANA-reserved documentation domain "
+                      "(suppress_example_domains)")
+        else:
+            reason = f"{kind} suppressed by an unknown rule"
+        suppressed.append((kind, start, end, reason))
+    return sorted(suppressed, key=lambda e: (e[1], e[2], e[0]))
+
+
 def verify_clean(text, mode="config"):
     return len(non_overlapping(scan_all(text, mode))) == 0
 

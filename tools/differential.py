@@ -107,6 +107,22 @@ def python_side():
     rebuilt, changed = ref.redact_json_lines(nd, mode="config")
     blocks.append("N|" + rebuilt.replace("\n", "\\n"))
     blocks.append("C|" + ",".join(str(k) for k in changed))
+    # Eighth block: suppression transparency over probe lines with one
+    # suppressed candidate each plus a clean line.
+    probes = [
+        "release v1.2.3.4 and host 10.0.0.8",
+        "ref 7992739871300 paid",
+        "nothing hidden here",
+    ]
+    for probe in probes:
+        entries = ref.explain_suppressed(probe, mode="config")
+        if not entries:
+            blocks.append("X|-")
+            continue
+        parts = []
+        for kind, s, e, reason in entries:
+            parts.append(f"{kind} {s} {e} {reason}")
+        blocks.append("X|" + ";".join(parts))
     return blocks
 
 

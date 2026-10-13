@@ -172,4 +172,37 @@ fn main {
     changed_flat += lines_result.changed_indices[k].to_string()
   }
   println("C|" + changed_flat)
+  // Eighth block: suppression transparency over the same probe lines.
+  let probes = [
+    "release v1.2.3.4 and host 10.0.0.8",
+    "ref 7992739871300 paid",
+    "nothing hidden here",
+  ]
+  let gate = {
+    ..config,
+    suppress_version_ipv4: true,
+    require_known_card_prefix: true,
+    suppress_example_domains: true,
+  }
+  for probe in probes {
+    let entries = @scrub.explain_suppressed(probe, gate)
+    if entries.length() == 0 {
+      println("X|-")
+      continue
+    }
+    let mut parts = ""
+    for k = 0; k < entries.length(); k = k + 1 {
+      if k > 0 {
+        parts += ";"
+      }
+      parts += entries[k].kind.to_string() +
+        " " +
+        entries[k].start.to_string() +
+        " " +
+        entries[k].end.to_string() +
+        " " +
+        entries[k].reason
+    }
+    println("X|" + parts)
+  }
 }
