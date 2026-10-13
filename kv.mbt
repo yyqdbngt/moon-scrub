@@ -10,8 +10,8 @@
 /// redacts every value with the standard pipeline, and leaves keys
 /// and structure untouched. Values the scanner missed still get the
 /// identity treatment (no redaction), so normal fields pass through
-/// byte-identical; findings inside quoted values collapse to one
-/// marker per value rather than several.
+/// byte-identical; findings inside quoted values are replaced in
+/// place, keeping the surrounding prose for debugging.
 
 ///|
 fn kv_find_value_end(text : String, start : Int) -> (Int, Bool) {

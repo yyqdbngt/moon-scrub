@@ -90,6 +90,12 @@ def python_side():
         blocks.append("D|" + (",".join(report) if report else "-"))
         located = ref.locate_findings(mutated, after)
         blocks.append("L|" + ";".join(ref.format_location(x) for x in located))
+    # Sixth block: key-value adaptation of each corpus line plus a quoted
+    # variant with a secret containing a space, exercising collapse.
+    for line in lines:
+        blocks.append("K|" + ref.redact_kv(line, mode="config")[0])
+        kv = 'msg="' + line + '" level=info'
+        blocks.append("Q|" + ref.redact_kv(kv, mode="config")[0])
     return blocks
 
 

@@ -133,4 +133,11 @@ fn main {
     }
     println("L|" + marks)
   }
+  // Sixth block: key-value adaptation of each line plus a quoted
+  // variant with a secret containing a space, exercising collapse.
+  for line in corpus() {
+    println("K|" + @scrub.redact_kv(line, config))
+    let kv = "msg=\"" + line + "\" level=info"
+    println("Q|" + @scrub.redact_kv(kv, config))
+  }
 }

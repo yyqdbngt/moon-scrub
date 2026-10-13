@@ -676,6 +676,70 @@ def format_location(located):
     kind, _start, _end, confidence, line, column = located
     return f"line {line}, col {column}: {kind} ({confidence})"
 
+def _kv_value_end(text, start):
+    quote = text[start]
+    if quote in ("\"", "'"):
+        i = start + 1
+        while i < len(text):
+            c = text[i]
+            if quote == "\"" and c == "\\":
+                i += 2
+                continue
+            if c == quote:
+                return i + 1
+            i += 1
+        return len(text)
+    i = start
+    while i < len(text) and text[i] != " ":
+        i += 1
+    return i
+
+
+def redact_kv(text, mode="config"):
+    """Key-value log line adapter, mirroring the MoonBit redact_kv.
+
+    Bare values: standard per-finding replacement. Quoted values with
+    any finding: whole-quote collapse to a single marker (the typed
+    marker of the first finding kind in the value).
+    """
+    out = []
+    cursor = 0
+    i = 0
+    n = len(text)
+    while i < n:
+        while i < n and text[i] == " ":
+            i += 1
+        if i >= n:
+            break
+        eq = -1
+        j = i
+        while j < n and text[j] != " ":
+            if text[j] == "=" and eq < 0:
+                eq = j
+            j += 1
+        if eq < 0 or eq + 1 >= n:
+            i = j
+            continue
+        value_start = eq + 1
+        value_end = _kv_value_end(text, value_start)
+        quote = text[value_start] if value_start < n else ""
+        if quote in ("\"", "'"):
+            closing = value_end - 1 < n and text[value_end - 1] == quote
+            inner = text[value_start + 1:value_end - 1] if closing else text[value_start + 1:value_end]
+            redacted = redact(inner, style="typed", mode=mode)[0]
+            if redacted != inner:
+                out.append(text[cursor:value_start + 1])
+                out.append(redacted)
+                if closing:
+                    out.append(quote)
+                cursor = value_end
+        i = value_end if value_end > i else j
+    if cursor == 0:
+        return redact(text, style="typed", mode=mode)[0], {}
+    tail, _ = redact(text[cursor:], style="typed", mode=mode)
+    out.append(tail)
+    return "".join(out), {}
+
 def verify_clean(text, mode="config"):
     return len(non_overlapping(scan_all(text, mode))) == 0
 
