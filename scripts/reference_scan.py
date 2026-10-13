@@ -388,7 +388,61 @@ CREDENTIALS = {
     "tokens", "bearer", "jwt", "private", "url", "assignment", "basic",
 }
 LEGACY_POLICY_EXTRA = {"email", "ipv4", "card"}
-CONFIG_EXTRA = {"resident", "mac", "uuid", "ipv6", "public", "wallet", "webhook"}
+CONFIG_EXTRA = {"resident", "mac", "uuid", "ipv6", "public", "wallet", "webhook", "iban"}
+
+
+IBAN_LENGTHS = {
+    "AD": 24, "AE": 23, "AT": 20, "BG": 28, "BE": 16, "BR": 29, "CH": 21,
+    "CY": 28, "CZ": 24, "DE": 22, "DK": 18, "EE": 16, "ES": 24, "FI": 18,
+    "FR": 27, "GB": 22, "GR": 27, "HR": 21, "HU": 28, "IE": 22, "IL": 23,
+    "IS": 26, "IT": 27, "LI": 21, "LT": 20, "LU": 20, "LV": 21, "MT": 31,
+    "MU": 30, "NL": 18, "NO": 15, "PL": 28, "PT": 25, "QA": 29, "RO": 24,
+    "SA": 24, "SE": 24, "SI": 19, "SK": 24, "SM": 27, "TR": 26,
+}
+
+
+def _iban_alnum_upper(ch):
+    return ("A" <= ch <= "Z") or ("0" <= ch <= "9")
+
+
+def _iban_mod97_ok(run):
+    remainder = 0
+    for ch in run[4:] + run[:4]:
+        if "A" <= ch <= "Z":
+            remainder = (remainder * 100 + (ord(ch) - 65 + 10)) % 97
+        else:
+            remainder = (remainder * 10 + (ord(ch) - 48)) % 97
+    return remainder == 1
+
+
+def scan_ibans(text, out):
+    i = 0
+    n = len(text)
+    while i < n:
+        boundary = i == 0 or not _iban_alnum_upper(text[i - 1])
+        four_ok = (
+            i + 4 <= n
+            and "A" <= text[i] <= "Z"
+            and "A" <= text[i + 1] <= "Z"
+            and text[i + 2].isdigit() and text[i + 3].isdigit()
+            and text[i + 2] == text[i + 2].upper()
+            and text[i + 3] == text[i + 3].upper()
+        )
+        if boundary and four_ok:
+            end = i
+            while end < n and _iban_alnum_upper(text[end]):
+                end += 1
+            run = text[i:end]
+            length = end - i
+            if (
+                15 <= length <= 34
+                and IBAN_LENGTHS.get(run[:2], 0) == length
+                and _iban_mod97_ok(run)
+            ):
+                push(out, "IBAN", i, end, "HIGH")
+                i = end
+                continue
+        i += 1
 
 
 def families_for(mode):
@@ -399,7 +453,7 @@ def families_for(mode):
     if mode == "secrets":
         return CREDENTIALS
     if mode == "standard":
-        return CREDENTIALS | LEGACY_POLICY_EXTRA
+        return CREDENTIALS | LEGACY_POLICY_EXTRA | {"iban"}
     if mode == "config":
         return CREDENTIALS | LEGACY_POLICY_EXTRA | CONFIG_EXTRA
     if mode == "phone":
@@ -432,6 +486,7 @@ def scan_all(text, mode):
     if "entropy" in fam: scan_high_entropy(text, out)
     if "pattern" in fam: scan_pattern_rules(text, out)
     if "card" in fam: scan_cards(text, out)
+    if "iban" in fam: scan_ibans(text, out)
     return sorted(out, key=lambda f: (f[1], -f[2]))
 
 

@@ -852,6 +852,66 @@
           "confidence": "HIGH"
         }
       ]
+    },
+    {
+      "name": "iban-german-registry",
+      "mode": "config",
+      "input": "invoice DE89370400440532013000 settled",
+      "expect": [
+        {
+          "kind": "IBAN",
+          "literal": "DE89370400440532013000",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "iban-british-registry",
+      "mode": "config",
+      "input": "pay GB29NWBK60161331926819 now",
+      "expect": [
+        {
+          "kind": "IBAN",
+          "literal": "GB29NWBK60161331926819",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "iban-french-check-letters",
+      "mode": "config",
+      "input": "acct FR1420041010050500013M02606 ok",
+      "expect": [
+        {
+          "kind": "IBAN",
+          "literal": "FR1420041010050500013M02606",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "iban-dutch-short",
+      "mode": "config",
+      "input": "NL91ABNA0417164300",
+      "expect": [
+        {
+          "kind": "IBAN",
+          "literal": "NL91ABNA0417164300",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "name": "iban-spanish",
+      "mode": "config",
+      "input": "to ES9121000418450200051332 thanks",
+      "expect": [
+        {
+          "kind": "IBAN",
+          "literal": "ES9121000418450200051332",
+          "confidence": "HIGH"
+        }
+      ]
     }
   ]
 }

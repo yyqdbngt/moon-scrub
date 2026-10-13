@@ -1244,3 +1244,93 @@ test "vector: sentry-dsn-token" {
     "sntrys_eyJpYXQiOjE3Mfake00000000000000000",
   )
 }
+
+///|
+test "vector: iban-german-registry" {
+  let input = "invoice DE89370400440532013000 settled"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "IBAN")
+  assert_eq(findings[0].start, 8)
+  assert_eq(findings[0].end, 30)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "DE89370400440532013000",
+  )
+}
+
+///|
+test "vector: iban-british-registry" {
+  let input = "pay GB29NWBK60161331926819 now"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "IBAN")
+  assert_eq(findings[0].start, 4)
+  assert_eq(findings[0].end, 26)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "GB29NWBK60161331926819",
+  )
+}
+
+///|
+test "vector: iban-french-check-letters" {
+  let input = "acct FR1420041010050500013M02606 ok"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "IBAN")
+  assert_eq(findings[0].start, 5)
+  assert_eq(findings[0].end, 32)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "FR1420041010050500013M02606",
+  )
+}
+
+///|
+test "vector: iban-dutch-short" {
+  let input = "NL91ABNA0417164300"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "IBAN")
+  assert_eq(findings[0].start, 0)
+  assert_eq(findings[0].end, 18)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "NL91ABNA0417164300",
+  )
+}
+
+///|
+test "vector: iban-spanish" {
+  let input = "to ES9121000418450200051332 thanks"
+  let findings = @moon_scrub.scan_with_config(
+    input,
+    @moon_scrub.ScanConfig::standard(),
+  )
+  assert_eq(findings.length(), 1)
+  assert_eq(findings[0].kind.to_string(), "IBAN")
+  assert_eq(findings[0].start, 3)
+  assert_eq(findings[0].end, 27)
+  assert_eq(findings[0].confidence, @moon_scrub.High)
+  assert_eq(
+    input[findings[0].start:findings[0].end].to_owned(),
+    "ES9121000418450200051332",
+  )
+}
