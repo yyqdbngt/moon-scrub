@@ -113,3 +113,11 @@ let result = redact_json_lines(ndjson_text)
 // result.changed_indices  只有实际变化的行号,便于只投递变更行
 // 解析成功且无命中的行逐字节原样返回;坏行回退纯文本扫描,不波及邻居
 ```
+
+## 14. 抑制透明化:被吃掉的候选去哪了
+
+```moonbit
+let hidden = explain_suppressed(text, config)
+// 每项: kind + 区间 + 命中的抑制规则名(v1.2.3.4 形态 IPv4、
+// 非卡组织 Luhn 数字、IANA 文档域邮箱)。报告里"没有"不再等于"干净"
+```
